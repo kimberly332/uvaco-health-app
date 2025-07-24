@@ -85,7 +85,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             type="text"
             value={formData.system}
             onChange={(e) => setFormData({...formData, system: e.target.value})}
-            placeholder="例：xxx體系、xxx老師"
+            placeholder="例：xx體系"
             style={inputStyle}
           />
         </div>
