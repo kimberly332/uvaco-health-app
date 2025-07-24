@@ -7,8 +7,8 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
     userName: '',
     isNamePublic: true,
     duration: '',
-    story: '',
-    imageUrl: ''
+    story: ''
+    // 已移除 imageUrl 欄位
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,8 +30,8 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
         isNamePublic: formData.isNamePublic,
         system: formData.system.trim(),
         duration: formData.duration.trim(),
-        story: formData.story.trim(),
-        imageUrl: formData.imageUrl.trim()
+        story: formData.story.trim()
+        // 已移除 imageUrl
       };
       
       await onSubmit(testimonial);
@@ -70,26 +70,28 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             onChange={(e) => setFormData({...formData, productId: e.target.value})}
             style={inputStyle}
           >
-            <option value="">請選擇產品</option>
+            <option value="">請選擇產品...</option>
             {products.map(product => (
-              <option key={product.id} value={product.id}>{product.name}</option>
+              <option key={product.id} value={product.id}>
+                {product.name}
+              </option>
             ))}
           </select>
         </div>
         
         <div style={{ marginBottom: '20px' }}>
-          <label style={labelStyle}>所在體系（選填）</label>
+          <label style={labelStyle}>體系 / 上線（選填）</label>
           <input 
             type="text"
             value={formData.system}
             onChange={(e) => setFormData({...formData, system: e.target.value})}
-            placeholder="例：台北體系"
+            placeholder="例：xxx體系、xxx老師"
             style={inputStyle}
           />
         </div>
         
         <div style={{ marginBottom: '20px' }}>
-          <label style={labelStyle}>您的姓名 <span style={{ color: '#dc3545' }}>*</span></label>
+          <label style={labelStyle}>姓名 <span style={{ color: '#dc3545' }}>*</span></label>
           <input 
             type="text"
             value={formData.userName}
@@ -97,24 +99,17 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             placeholder="請輸入您的姓名"
             style={inputStyle}
           />
-        </div>
-        
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            cursor: 'pointer'
-          }}>
-            <input 
-              type="checkbox"
-              checked={formData.isNamePublic}
-              onChange={(e) => setFormData({...formData, isNamePublic: e.target.checked})}
-              style={{ marginRight: '8px', transform: 'scale(1.2)' }}
-            />
-            <span style={{ fontSize: '14px' }}>
-              公開顯示姓名（取消勾選將顯示為匿名用戶）
-            </span>
-          </label>
+          <div style={{ marginTop: '10px' }}>
+            <label style={{ fontSize: '14px', color: '#666', cursor: 'pointer' }}>
+              <input 
+                type="checkbox"
+                checked={formData.isNamePublic}
+                onChange={(e) => setFormData({...formData, isNamePublic: e.target.checked})}
+                style={{ marginRight: '5px' }}
+              />
+              公開顯示姓名（取消勾選將以匿名方式分享）
+            </label>
+          </div>
         </div>
         
         <div style={{ marginBottom: '20px' }}>
@@ -150,23 +145,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           </div>
         </div>
         
-        <div style={{ marginBottom: '30px' }}>
-          <label style={labelStyle}>見證圖片（選填）</label>
-          <input 
-            type="text"
-            value={formData.imageUrl}
-            onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-            placeholder="請輸入圖片網址，或留空"
-            style={inputStyle}
-          />
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#666', 
-            marginTop: '5px' 
-          }}>
-            建議上傳產品使用前後對比照或相關圖片
-          </div>
-        </div>
+        {/* 已完全移除見證圖片欄位 */}
         
         <div style={{ 
           display: 'flex', 

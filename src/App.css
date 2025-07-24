@@ -184,7 +184,7 @@ body {
   font-size: var(--font-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--gray-800);
-  text-align: center;
+  /* text-align: center; */
   margin-bottom: var(--space-5);
 }
 
@@ -324,50 +324,45 @@ body {
   gap: var(--space-1);
 }
 
-/* Series-specific icons using attribute selectors */
+/* 產品系列圖示映射 - 完全對應選項列表 */
 .product-card-series[data-series="基本保養系列"]::before {
-  content: "🟢";
-  font-size: var(--font-sm);
-}
-
-.product-card-series[data-series="調理系列"]::before {
-  content: "🔵";
+  content: "🟢"; /* 基本保養系列 - 綠色圓圈 */
   font-size: var(--font-sm);
 }
 
 .product-card-series[data-series="清除系列"]::before {
-  content: "🟤";
+  content: "⚫"; /* 清除系列 - 黑色圓圈 */
   font-size: var(--font-sm);
 }
 
-.product-card-series[data-series="美容保健系列"]::before {
-  content: "🟣";
+.product-card-series[data-series="調理系列"]::before {
+  content: "🔵"; /* 調理系列 - 藍色圓圈 */
   font-size: var(--font-sm);
 }
 
-.product-card-series[data-series="生活保養系列"]::before {
-  content: "🟡";
-  font-size: var(--font-sm);
-}
-
-.product-card-series[data-series="營養補充系列"]::before {
-  content: "🟠";
-  font-size: var(--font-sm);
-}
-
-.product-card-series[data-series="全身調理系列"]::before {
-  content: "🔴";
+.product-card-series[data-series="活力丰采系列"]::before {
+  content: "🔴"; /* 活力丰采系列 - 紅色圓圈 */
   font-size: var(--font-sm);
 }
 
 .product-card-series[data-series="寵物食品系列"]::before {
-  content: "🟨";
+  content: "🟡"; /* 寵物食品系列 - 黃色圓圈 */
   font-size: var(--font-sm);
 }
 
-/* Fallback for other series - this should be last to have lower specificity */
+.product-card-series[data-series="生活保養系列"]::before {
+  content: "🟣"; /* 生活保養系列 - 紫色圓圈 */
+  font-size: var(--font-sm);
+}
+
+.product-card-series[data-series="全身調理系列"]::before {
+  content: "🟤"; /* 全身調理系列 - 棕色圓圈 */
+  font-size: var(--font-sm);
+}
+
+/* 後備預設圖示 - 針對未定義系列 */
 .product-card-series:not([data-series])::before {
-  content: "📦";
+  content: "📦"; /* 預設包裹圖示 */
   font-size: var(--font-sm);
 }
 
