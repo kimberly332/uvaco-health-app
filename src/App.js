@@ -61,13 +61,28 @@ function App() {
       );
     }
     
-    // 再進行排序
+    // 再進行排序和篩選
     const sortedProducts = [...filtered];
     switch (productSortBy) {
-      case 'name':
-        return sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
       case 'series':
         return sortedProducts.sort((a, b) => a.series.localeCompare(b.series));
+      
+      // 特定系列篩選
+      case 'series-基本保養系列':
+        return sortedProducts.filter(product => product.series === '基本保養系列');
+      case 'series-清除系列':
+        return sortedProducts.filter(product => product.series === '清除系列');
+      case 'series-調理系列':
+        return sortedProducts.filter(product => product.series === '調理系列');
+      case 'series-活力丰采系列':
+        return sortedProducts.filter(product => product.series === '活力丰采系列');
+      case 'series-寵物食品系列':
+        return sortedProducts.filter(product => product.series === '寵物食品系列');
+      case 'series-生活保養系列':
+        return sortedProducts.filter(product => product.series === '生活保養系列');
+      case 'series-全身調理系列':
+        return sortedProducts.filter(product => product.series === '全身調理系列');
+      
       case 'testimonials-desc':
         return sortedProducts.sort((a, b) => {
           const countA = testimonials.filter(t => t.productId === a.id).length;
@@ -164,14 +179,8 @@ function App() {
 
   if (productsLoading || testimonialsLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        flexDirection: 'column'
-      }}>
-        <div style={{ fontSize: '24px', marginBottom: '10px' }}>⏳</div>
+      <div className="loading-container">
+        <div className="loading-spinner">⏳</div>
         <div>載入中...</div>
       </div>
     );
@@ -180,7 +189,18 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Uvaco 健康生活</h1>
+        <div className="header-content">
+          <img 
+            src="/assets/logo.png" 
+            alt="Uvaco Logo" 
+            className="logo"
+            onError={(e) => {
+              // Fallback if logo doesn't load
+              e.target.style.display = 'none';
+            }}
+          />
+          <h1>健康生活</h1>
+        </div>
       </header>
       
       <main className="app-main">
@@ -211,37 +231,25 @@ function App() {
 
             {/* 產品列表 */}
             {filteredAndSortedProducts.length > 0 ? (
-              filteredAndSortedProducts.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onViewDetails={handleViewProductDetails}
-                  testimonialCount={getTestimonialCountForProduct(product.id)}
-                />
-              ))
+              <div className="products-grid">
+                {filteredAndSortedProducts.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onViewDetails={handleViewProductDetails}
+                    testimonialCount={getTestimonialCountForProduct(product.id)}
+                  />
+                ))}
+              </div>
             ) : (
-              <div style={{
-                textAlign: 'center',
-                padding: '40px 20px',
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                color: '#666'
-              }}>
-                <div style={{ fontSize: '48px', marginBottom: '15px' }}>🔍</div>
+              <div className="empty-state">
+                <div className="empty-state-icon">🔍</div>
                 <h3>找不到符合條件的產品</h3>
                 <p>試試其他關鍵字或清除搜尋條件</p>
                 {productSearchTerm && (
                   <button
                     onClick={handleClearProductSearch}
-                    style={{
-                      padding: '10px 20px',
-                      backgroundColor: '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      marginTop: '10px'
-                    }}
+                    className="btn btn-primary btn-sm"
                   >
                     清除搜尋
                   </button>
@@ -267,8 +275,7 @@ function App() {
 
             <button 
               onClick={() => handleAddTestimonial()} 
-              className="add-testimonial-btn"
-              style={{ marginBottom: '15px' }}
+              className="btn btn-add-testimonial btn-full"
             >
               + 分享我的見證
             </button>
@@ -287,28 +294,14 @@ function App() {
                 <TestimonialCard key={testimonial.id} testimonial={testimonial} />
               ))
             ) : (
-              <div style={{
-                textAlign: 'center',
-                padding: '40px 20px',
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                color: '#666'
-              }}>
-                <div style={{ fontSize: '48px', marginBottom: '15px' }}>💭</div>
+              <div className="empty-state">
+                <div className="empty-state-icon">💭</div>
                 <h3>找不到符合條件的見證</h3>
                 <p>試試其他關鍵字或清除篩選條件</p>
                 {(testimonialSearchTerm || selectedProductFilter) && (
                   <button
                     onClick={handleClearTestimonialFilters}
-                    style={{
-                      padding: '10px 20px',
-                      backgroundColor: '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      marginTop: '10px'
-                    }}
+                    className="btn btn-primary btn-sm"
                   >
                     清除篩選
                   </button>
