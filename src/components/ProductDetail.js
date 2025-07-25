@@ -64,14 +64,14 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
         </div>
         
         <div style={{ marginBottom: '20px' }}>
-          <h3 style={{ color: '#333', marginBottom: '10px' }}>適用症狀</h3>
+          <h3 style={{ color: '#333', marginBottom: '10px' }}>保健方向</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {product.conditions.map((condition, index) => (
               <span 
                 key={index}
                 style={{
-                  backgroundColor: '#fff3e0',
-                  color: '#f57c00',
+                  backgroundColor: '#e3f2fd',
+                  color: '#1976d2',
                   padding: '4px 12px',
                   borderRadius: '16px',
                   fontSize: '14px'
@@ -80,6 +80,15 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
                 {condition}
               </span>
             ))}
+          </div>
+          {/* 加入小提醒 */}
+          <div style={{
+            fontSize: '12px',
+            color: '#666',
+            marginTop: '8px',
+            fontStyle: 'italic'
+          }}>
+            * 以上為營養保健參考方向，非醫療用途
           </div>
         </div>
         
@@ -122,7 +131,7 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          用戶見證
+          用戶心得分享
           <span style={{ 
             backgroundColor: '#007bff',
             color: 'white',
@@ -133,6 +142,22 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
             {testimonials.length} 則
           </span>
         </h3>
+        
+        {/* 產品頁面的免責聲明 */}
+        {testimonials.length > 0 && (
+          <div style={{
+            backgroundColor: '#fff3cd',
+            border: '1px solid #ffeaa7',
+            borderRadius: '6px',
+            padding: '12px',
+            marginBottom: '15px',
+            fontSize: '13px',
+            color: '#856404'
+          }}>
+            <strong>📝 閱讀提醒：</strong>
+            以下為用戶個人使用體驗分享，不代表產品功效，效果因人而異
+          </div>
+        )}
         
         {testimonials.length > 0 ? (
           <div>
@@ -147,8 +172,8 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
             color: '#999'
           }}>
             <div style={{ fontSize: '48px', marginBottom: '10px' }}>💭</div>
-            <p>還沒有用戶見證</p>
-            <p style={{ fontSize: '14px' }}>成為第一個分享使用心得的人吧！</p>
+            <p>還沒有用戶心得分享</p>
+            <p style={{ fontSize: '14px' }}>成為第一個分享使用體驗的人吧！</p>
           </div>
         )}
       </div>

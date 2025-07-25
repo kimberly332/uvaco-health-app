@@ -38,18 +38,71 @@ const TestimonialCard = ({ testimonial }) => {
         </div>
       </div>
       
+      {/* 個人體驗標籤 */}
+      <div style={{
+        display: 'inline-block',
+        backgroundColor: '#e3f2fd',
+        color: '#1976d2',
+        padding: '4px 8px',
+        borderRadius: '12px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        marginBottom: '10px'
+      }}>
+        個人體驗分享
+      </div>
+      
       <div style={{ 
         backgroundColor: '#f8f9fa', 
         padding: '12px', 
         borderRadius: '6px',
-        borderLeft: '4px solid #28a745'
+        borderLeft: '4px solid #28a745',
+        position: 'relative'
       }}>
-        <div style={{ fontSize: '14px', lineHeight: '1.5', color: '#333' }}>
+        {/* 引號裝飾 */}
+        <div style={{
+          position: 'absolute',
+          top: '5px',
+          left: '5px',
+          fontSize: '20px',
+          color: '#28a745',
+          opacity: 0.3
+        }}>
+          "
+        </div>
+        
+        <div style={{ 
+          fontSize: '14px', 
+          lineHeight: '1.5', 
+          color: '#333',
+          paddingLeft: '15px',
+          fontStyle: 'italic'
+        }}>
           {testimonial.story || '無使用心得'}
+        </div>
+        
+        <div style={{
+          position: 'absolute',
+          bottom: '5px',
+          right: '8px',
+          fontSize: '20px',
+          color: '#28a745',
+          opacity: 0.3
+        }}>
+          "
         </div>
       </div>
       
-      {/* 已完全移除圖片顯示區塊 */}
+      {/* 底部免責說明 */}
+      <div style={{
+        marginTop: '8px',
+        fontSize: '11px',
+        color: '#999',
+        textAlign: 'right',
+        fontStyle: 'italic'
+      }}>
+        * 個人使用體驗，效果因人而異
+      </div>
     </div>
   );
 };

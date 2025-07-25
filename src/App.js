@@ -261,7 +261,29 @@ function App() {
         
         {currentView === 'testimonials' && (
           <div>
-            <h2>用戶見證</h2>
+            <h2>用戶心得分享</h2>
+            
+            {/* 法規免責聲明 */}
+            <div style={{
+              backgroundColor: '#e8f4fd',
+              border: '1px solid #bee5eb',
+              borderRadius: '8px',
+              padding: '15px',
+              marginBottom: '20px',
+              fontSize: '14px',
+              color: '#0c5460'
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                <span style={{ marginRight: '8px' }}>ℹ️</span>
+                重要聲明
+              </div>
+              <div style={{ lineHeight: '1.5' }}>
+                • 以下分享內容為用戶個人使用體驗，不代表產品功效<br/>
+                • 每個人使用感受可能不同，實際體驗因人而異<br/>
+                • 本產品為食品，不具醫療功效，不可取代正規醫療<br/>
+                • 如有健康問題，請諮詢專業醫師
+              </div>
+            </div>
             
             {/* 見證篩選 */}
             <TestimonialFilter
@@ -277,7 +299,7 @@ function App() {
               onClick={() => handleAddTestimonial()} 
               className="btn btn-add-testimonial btn-full"
             >
-              + 分享我的見證
+              + 分享我的使用心得
             </button>
 
             {/* 搜尋結果統計 */}
@@ -285,18 +307,33 @@ function App() {
               totalCount={testimonials.length}
               filteredCount={filteredTestimonials.length}
               searchTerm={testimonialSearchTerm || (selectedProductFilter ? '篩選條件' : '')}
-              type="見證"
+              type="心得分享"
             />
 
             {/* 見證列表 */}
             {filteredTestimonials.length > 0 ? (
-              filteredTestimonials.map(testimonial => (
-                <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-              ))
+              <div>
+                {filteredTestimonials.map(testimonial => (
+                  <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+                ))}
+                
+                {/* 底部再次提醒 */}
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  marginTop: '20px',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  color: '#6c757d'
+                }}>
+                  以上為用戶個人使用體驗分享，效果因人而異
+                </div>
+              </div>
             ) : (
               <div className="empty-state">
                 <div className="empty-state-icon">💭</div>
-                <h3>找不到符合條件的見證</h3>
+                <h3>找不到符合條件的心得分享</h3>
                 <p>試試其他關鍵字或清除篩選條件</p>
                 {(testimonialSearchTerm || selectedProductFilter) && (
                   <button
@@ -330,20 +367,20 @@ function App() {
         )}
       </main>
       
-      <nav className="app-nav">
-        <button 
-          onClick={() => setCurrentView('products')}
-          className={currentView === 'products' || currentView === 'product-detail' ? 'active' : ''}
-        >
-          產品介紹
-        </button>
-        <button 
-          onClick={() => setCurrentView('testimonials')}
-          className={currentView === 'testimonials' || currentView === 'add-testimonial' ? 'active' : ''}
-        >
-          用戶見證
-        </button>
-      </nav>
+     <nav className="app-nav">
+      <button 
+        onClick={() => setCurrentView('products')}
+        className={currentView === 'products' || currentView === 'product-detail' ? 'active' : ''}
+      >
+        產品介紹
+      </button>
+      <button 
+        onClick={() => setCurrentView('testimonials')}
+        className={currentView === 'testimonials' || currentView === 'add-testimonial' ? 'active' : ''}
+      >
+        心得分享
+      </button>
+    </nav>
     </div>
   );
 }
