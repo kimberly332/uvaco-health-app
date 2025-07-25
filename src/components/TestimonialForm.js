@@ -3,38 +3,42 @@ import React, { useState } from 'react';
 const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     productId: selectedProduct?.id || '',
-    system: '',
     userName: '',
     isNamePublic: true,
+    system: '',
     duration: '',
     story: ''
-    // 已移除 imageUrl 欄位
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!formData.productId || !formData.userName.trim() || !formData.story.trim()) {
-      alert('請填寫必填欄位：產品、姓名、使用心得');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.productId || !formData.userName || !formData.story || !formData.duration) {
+      alert('請填寫所有必填欄位');
       return;
     }
-    
+
+    if (formData.story.length > 500) {
+      alert('使用心得不能超過500字');
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      const selectedProd = products.find(p => p.id === formData.productId);
-      const testimonial = {
-        productId: formData.productId,
-        productName: selectedProd?.name || '',
-        userName: formData.userName.trim(),
-        isNamePublic: formData.isNamePublic,
-        system: formData.system.trim(),
-        duration: formData.duration.trim(),
-        story: formData.story.trim()
-        // 已移除 imageUrl
+      const selectedProductData = products.find(p => p.id === formData.productId);
+      
+      const testimonialData = {
+        ...formData,
+        productName: selectedProductData?.name || '未知產品',
+        id: Date.now(),
+        createdAt: new Date().toISOString()
       };
       
-      await onSubmit(testimonial);
+      await onSubmit(testimonialData);
+      alert('見證提交成功！感謝您的分享。');
     } catch (error) {
       alert('提交失敗，請稍後再試');
     } finally {
@@ -59,35 +63,54 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
   };
 
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '20px' }}>
-      <h2 style={{ marginBottom: '20px', color: '#333' }}>💬 分享使用心得</h2>
+    <div style={{ 
+      backgroundColor: 'white', 
+      padding: '20px', 
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <h2 style={{ marginBottom: '20px', color: '#333' }}>分享使用心得</h2>
       
-      <div>
+      {/* 新增：用詞提醒區塊 */}
+      <div style={{
+        backgroundColor: '#e3f2fd',
+        border: '1px solid #2196f3',
+        borderRadius: '8px',
+        padding: '15px',
+        marginBottom: '20px'
+      }}>
+        <h4 style={{ color: '#1976d2', marginBottom: '10px', fontSize: '16px' }}>
+          📝 分享注意事項
+        </h4>
+        <ul style={{ 
+          margin: '0',
+          paddingLeft: '20px',
+          fontSize: '14px',
+          color: '#1565c0',
+          lineHeight: '1.6'
+        }}>
+          <li>請真實分享您的使用體驗，避免誇大描述</li>
+          <li>建議用詞：「改善」、「幫助」、「感覺」、「體驗到」</li>
+          <li>避免用詞：「有效」、「治療」、「治好」、「神奇」</li>
+          <li>您的分享將幫助其他用戶了解產品特性</li>
+        </ul>
+      </div>
+
+      <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>選擇產品 <span style={{ color: '#dc3545' }}>*</span></label>
-          <select 
+          <select
             value={formData.productId}
             onChange={(e) => setFormData({...formData, productId: e.target.value})}
             style={inputStyle}
           >
-            <option value="">請選擇產品...</option>
+            <option value="">請選擇產品</option>
             {products.map(product => (
               <option key={product.id} value={product.id}>
                 {product.name}
               </option>
             ))}
           </select>
-        </div>
-        
-        <div style={{ marginBottom: '20px' }}>
-          <label style={labelStyle}>體系 / 上線（選填）</label>
-          <input 
-            type="text"
-            value={formData.system}
-            onChange={(e) => setFormData({...formData, system: e.target.value})}
-            placeholder="例：xx體系"
-            style={inputStyle}
-          />
         </div>
         
         <div style={{ marginBottom: '20px' }}>
@@ -100,7 +123,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             style={inputStyle}
           />
           <div style={{ marginTop: '10px' }}>
-            <label style={{ fontSize: '14px', color: '#666', cursor: 'pointer' }}>
+            <label style={{ fontSize: '14px', color: '#666' }}>
               <input 
                 type="checkbox"
                 checked={formData.isNamePublic}
@@ -110,6 +133,17 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
               公開顯示姓名（取消勾選將以匿名方式分享）
             </label>
           </div>
+        </div>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <label style={labelStyle}>體系（選填）</label>
+          <input 
+            type="text"
+            value={formData.system}
+            onChange={(e) => setFormData({...formData, system: e.target.value})}
+            placeholder="例：xx體系"
+            style={inputStyle}
+          />
         </div>
         
         <div style={{ marginBottom: '20px' }}>
@@ -128,7 +162,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           <textarea 
             value={formData.story}
             onChange={(e) => setFormData({...formData, story: e.target.value})}
-            placeholder="請詳細分享您的使用心得，包括使用前後的變化、感受等..."
+            placeholder="請分享您的使用體驗，例如：使用後感覺精神改善了、生活品質有幫助等..."
             rows="6"
             style={{
               ...inputStyle,
@@ -138,14 +172,13 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           />
           <div style={{ 
             fontSize: '12px', 
-            color: '#666', 
+            color: formData.story.length > 500 ? '#dc3545' : '#666', 
             marginTop: '5px' 
           }}>
             {formData.story.length}/500 字
+            {formData.story.length > 500 && <span style={{ color: '#dc3545' }}> (超出字數限制)</span>}
           </div>
         </div>
-        
-        {/* 已完全移除見證圖片欄位 */}
         
         <div style={{ 
           display: 'flex', 
@@ -153,22 +186,23 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           marginTop: '30px'
         }}>
           <button 
-            onClick={handleSubmit}
-            disabled={isSubmitting}
+            type="submit"
+            disabled={isSubmitting || formData.story.length > 500}
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: isSubmitting ? '#ccc' : '#28a745',
+              backgroundColor: (isSubmitting || formData.story.length > 500) ? '#ccc' : '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
               fontSize: '16px',
-              cursor: isSubmitting ? 'not-allowed' : 'pointer'
+              cursor: (isSubmitting || formData.story.length > 500) ? 'not-allowed' : 'pointer'
             }}
           >
             {isSubmitting ? '提交中...' : '✓ 提交見證'}
           </button>
           <button 
+            type="button"
             onClick={onCancel}
             disabled={isSubmitting}
             style={{
@@ -185,21 +219,24 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             取消
           </button>
         </div>
-      </div>
+      </form>
       
+      {/* 修改後的溫馨提醒 */}
       <div style={{ 
         marginTop: '20px', 
         padding: '15px',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#fff3cd',
         borderRadius: '6px',
         fontSize: '14px',
-        color: '#666'
+        color: '#856404',
+        border: '1px solid #ffeaa7'
       }}>
-        <strong>溫馨提醒：</strong>
-        <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
-          <li>請誠實分享您的真實使用經驗</li>
-          <li>您的見證將幫助其他用戶了解產品效果</li>
-          <li>如不希望公開姓名，可選擇匿名分享</li>
+        <strong>📢 重要聲明：</strong>
+        <ul style={{ margin: '8px 0', paddingLeft: '20px', lineHeight: '1.5' }}>
+          <li>您的分享為個人使用體驗，僅供其他用戶參考</li>
+          <li>使用感受因個人體質及生活習慣不同而有差異</li>
+          <li>本產品為食品，不具醫療效果，無法替代醫師診斷</li>
+          <li>如有健康疑慮，請諮詢專業醫療人員</li>
         </ul>
       </div>
     </div>

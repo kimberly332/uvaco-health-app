@@ -1059,3 +1059,129 @@ body {
     border: 1px solid var(--gray-300);
   }
 }
+
+/* 合規聲明樣式 - 加入到 App.css */
+
+/* 主要免責聲明 */
+.main-disclaimer {
+  background-color: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.main-disclaimer-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #d63031;
+  margin-bottom: 10px;
+}
+
+.main-disclaimer-content {
+  font-size: 16px;
+  color: #856404;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.main-disclaimer-detail {
+  font-size: 14px;
+  color: #856404;
+  line-height: 1.5;
+}
+
+/* 小型免責聲明（見證卡片底部） */
+.small-disclaimer {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border-left: 3px solid #ffc107;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #856404;
+  font-style: italic;
+}
+
+/* 表單提醒區塊 */
+.form-reminder {
+  background-color: #e3f2fd;
+  border: 1px solid #2196f3;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.form-reminder-title {
+  color: #1976d2;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.form-reminder-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  color: #1565c0;
+  line-height: 1.6;
+}
+
+/* 表單底部聲明 */
+.form-bottom-disclaimer {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff3cd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.form-bottom-disclaimer strong {
+  color: #d63031;
+}
+
+.form-bottom-disclaimer ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+
+/* 產品頁面見證區塊提醒 */
+.product-testimonial-reminder {
+  background-color: #e8f4fd;
+  border: 1px solid #bee5eb;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 13px;
+  color: #0c5460;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .main-disclaimer {
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .main-disclaimer-title {
+    font-size: 16px;
+  }
+  
+  .main-disclaimer-content {
+    font-size: 14px;
+  }
+  
+  .main-disclaimer-detail {
+    font-size: 13px;
+  }
+  
+  .small-disclaimer {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}

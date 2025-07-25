@@ -7,84 +7,47 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
       <button 
         onClick={onBack}
         style={{
-          background: 'none',
+          marginBottom: '20px',
+          padding: '10px 15px',
+          backgroundColor: '#6c757d',
+          color: 'white',
           border: 'none',
-          fontSize: '18px',
-          cursor: 'pointer',
-          marginBottom: '15px',
-          color: '#007bff'
+          borderRadius: '6px',
+          cursor: 'pointer'
         }}
       >
         ← 返回產品列表
       </button>
       
       <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px' }}>
-        <img 
-          src={product.image} 
-          alt={product.name} 
-          style={{ 
-            width: '100%', 
-            maxWidth: '400px', 
-            borderRadius: '8px',
-            marginBottom: '15px'
-          }} 
-        />
+        <h2 style={{ color: '#333', marginBottom: '15px' }}>{product.name}</h2>
         
-        <h2 style={{ margin: '0 0 10px 0', color: '#333' }}>{product.name}</h2>
-        <p style={{ color: '#666', marginBottom: '5px' }}>
-          <strong>系列：</strong>{product.series}
-        </p>
-        <p style={{ 
-          color: '#007bff', 
-          fontSize: '20px', 
-          fontWeight: 'bold',
-          marginBottom: '20px'
-        }}>
-          {product.price}
-        </p>
-        
-        <div style={{ marginBottom: '20px' }}>
-          <h3 style={{ color: '#333', marginBottom: '10px' }}>營養成分</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {product.nutrients.map((nutrient, index) => (
-              <span 
-                key={index}
-                style={{
-                  backgroundColor: '#e8f5e8',
-                  color: '#2e7d32',
-                  padding: '4px 12px',
-                  borderRadius: '16px',
-                  fontSize: '14px'
-                }}
-              >
-                {nutrient}
-              </span>
-            ))}
-          </div>
+        <div style={{ marginBottom: '15px' }}>
+          <span style={{
+            display: 'inline-block',
+            backgroundColor: '#007bff',
+            color: 'white',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            fontSize: '12px',
+            marginRight: '10px'
+          }}>
+            {product.series}
+          </span>
+          <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#28a745' }}>
+            {product.price}
+          </span>
         </div>
         
         <div style={{ marginBottom: '20px' }}>
-          <h3 style={{ color: '#333', marginBottom: '10px' }}>適用症狀</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {product.conditions.map((condition, index) => (
-              <span 
-                key={index}
-                style={{
-                  backgroundColor: '#fff3e0',
-                  color: '#f57c00',
-                  padding: '4px 12px',
-                  borderRadius: '16px',
-                  fontSize: '14px'
-                }}
-              >
-                {condition}
-              </span>
-            ))}
-          </div>
-        </div>
-        
-        <div style={{ marginBottom: '20px' }}>
-          <h3 style={{ color: '#333', marginBottom: '10px' }}>產品說明</h3>
+          <h3 style={{ 
+            color: '#333', 
+            marginBottom: '10px',
+            borderBottom: '2px solid #f0f0f0',
+            paddingBottom: '5px'
+          }}>
+            產品介紹
+          </h3>
           <p style={{ 
             lineHeight: '1.6', 
             color: '#555',
@@ -133,6 +96,21 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
             {testimonials.length} 則
           </span>
         </h3>
+        
+        {/* 新增：見證區塊聲明 */}
+        {testimonials.length > 0 && (
+          <div style={{
+            backgroundColor: '#e8f4fd',
+            border: '1px solid #bee5eb',
+            borderRadius: '6px',
+            padding: '12px',
+            marginBottom: '15px',
+            fontSize: '13px',
+            color: '#0c5460'
+          }}>
+            💡 以下為用戶使用體驗分享，個人感受可能因體質不同而有差異
+          </div>
+        )}
         
         {testimonials.length > 0 ? (
           <div>

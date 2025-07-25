@@ -9,6 +9,45 @@ import { ProductSearch, TestimonialFilter, SearchResults } from './components/Se
 import { ProductSort } from './components/ProductStats';
 import './App.css';
 
+// 見證頁面頂部聲明組件
+const TestimonialPageDisclaimer = () => {
+  return (
+    <div style={{
+      backgroundColor: '#fff3cd',
+      border: '2px solid #ffc107',
+      borderRadius: '8px',
+      padding: '20px',
+      marginBottom: '20px',
+      textAlign: 'center'
+    }}>
+      <div style={{
+        fontSize: '18px',
+        fontWeight: 'bold',
+        color: '#d63031',
+        marginBottom: '10px'
+      }}>
+        ⚠️ 重要聲明
+      </div>
+      <div style={{
+        fontSize: '16px',
+        color: '#856404',
+        lineHeight: '1.6',
+        marginBottom: '10px'
+      }}>
+        以下為用戶個人使用體驗分享，僅供參考
+      </div>
+      <div style={{
+        fontSize: '14px',
+        color: '#856404',
+        lineHeight: '1.5'
+      }}>
+        使用感受因個人體質、生活型態等因素而異，不保證相同效果。<br/>
+        本產品未經衛生福利部評估，不具醫療效果，無法替代醫師診斷或治療。
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [currentView, setCurrentView] = useState('products');
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -262,6 +301,9 @@ function App() {
         {currentView === 'testimonials' && (
           <div>
             <h2>用戶見證</h2>
+            
+            {/* 新增：見證頁面頂部合規聲明 */}
+            <TestimonialPageDisclaimer />
             
             {/* 見證篩選 */}
             <TestimonialFilter

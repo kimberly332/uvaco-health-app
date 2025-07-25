@@ -49,7 +49,19 @@ const TestimonialCard = ({ testimonial }) => {
         </div>
       </div>
       
-      {/* 已完全移除圖片顯示區塊 */}
+      {/* 新增：合規聲明 */}
+      <div style={{
+        marginTop: '12px',
+        padding: '8px 12px',
+        backgroundColor: '#fff3cd',
+        borderLeft: '3px solid #ffc107',
+        borderRadius: '4px',
+        fontSize: '12px',
+        color: '#856404',
+        fontStyle: 'italic'
+      }}>
+        ※ 個人使用體驗分享，感受可能因體質不同而有差異。本產品為食品，無醫療功效。
+      </div>
     </div>
   );
 };
