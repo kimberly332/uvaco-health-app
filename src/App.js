@@ -191,7 +191,7 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <img 
-            src="/assets/logo.png" 
+            src="/assets/logo.svg" 
             alt="Uvaco Logo" 
             className="logo"
             onError={(e) => {
