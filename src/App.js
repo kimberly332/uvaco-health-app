@@ -191,7 +191,7 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <img 
-            src="/assets/logo.png" 
+            src="/assets/logo.svg" 
             alt="Uvaco Logo" 
             className="logo"
             onError={(e) => {
@@ -199,7 +199,7 @@ function App() {
               e.target.style.display = 'none';
             }}
           />
-          <h1>健康生活</h1>
+          <h1>葡眾健康生活</h1>
         </div>
       </header>
       
