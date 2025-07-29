@@ -547,7 +547,7 @@ export const INITIAL_PRODUCTS = [
     id: '40200',
     series: '調理系列',
     name: '衛傑膠囊(奶素)',
-    image: '/assets/衛傑膠囊.png',
+    image: '/assets/衛傑膠囊奶素.png',
     nutrients: [
       '鼠李糖乳酸菌粉(Lactobacillus rhamnosus GG)', '加氏乳酸菌粉(Lactobacillus gasseri)',
       '山藥粉', '硬脂酸鎂', '玉米澱粉', '猴頭菇子實體粉(Hericium erinaceus)', '茯苓粉'
@@ -563,7 +563,7 @@ export const INITIAL_PRODUCTS = [
     id: '40210',
     series: '調理系列',
     name: '百克斯膠囊(純素)',
-    image: '/assets/百克斯膠囊.png',
+    image: '/assets/百克斯膠囊純素.png',
     nutrients: [
       '蝙蝠蛾擬青黴菌絲體發酵液粉(Paecilomyces hepiali)', '玉米澱粉', '黑棗萃取物',
       '黨參萃取物', '薄荷萃取物', '靈芝液態發酵菌絲體萃取物(Ganoderma lucidum)',
@@ -581,7 +581,7 @@ export const INITIAL_PRODUCTS = [
     id: '40220',
     series: '調理系列',
     name: '清明亮膠囊(純素)',
-    image: '/assets/清明亮膠囊.png',
+    image: '/assets/清明亮膠囊純素.png',
     nutrients: [
       '熟地萃取物', '玉米澱粉', '枸杞萃取物', '葡萄籽萃取物',
       '山桑子萃取物', '綠花椰菜苗萃取物', '葉黃素(金盞花萃取物)',
@@ -598,7 +598,7 @@ export const INITIAL_PRODUCTS = [
     id: '40230',
     series: '調理系列',
     name: '艾逸膠囊(純素)',
-    image: '/assets/艾逸膠囊.png',
+    image: '/assets/艾逸膠囊純素.png',
     nutrients: [
       '微結晶狀α-纖維素', '靈芝菌絲體發酵液粉(Ganoderma lucidum)', '陳皮萃取物',
       '桑椹萃取物', '麥芽糊精', '玉米澱粉', '亞麻仁種子粉', '硬脂酸鎂',
