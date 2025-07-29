@@ -62,6 +62,186 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
             ))}
           </div>
         </div>
+
+        {/* 新增菌株詳細資訊區塊 - 只有康爾喜系列產品顯示 */}
+        {product.bacteriaDetails && product.bacteriaDetails.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <h3 style={{ 
+              color: '#333', 
+              marginBottom: '15px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              🦠 13種複合式乳酸菌詳細資訊
+              {product.bacteriaCount && (
+                <span style={{
+                  backgroundColor: '#ff6b6b',
+                  color: 'white',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  fontWeight: 'normal'
+                }}>
+                  1000億菌數
+                </span>
+              )}
+            </h3>
+            
+            {/* 菌數資訊 */}
+            {product.bacteriaCount && (
+              <div style={{
+                backgroundColor: '#e3f2fd',
+                border: '1px solid #bbdefb',
+                borderRadius: '6px',
+                padding: '12px',
+                marginBottom: '15px',
+                fontSize: '14px',
+                color: '#1976d2'
+              }}>
+                <strong>🔬 菌數資訊：</strong>{product.bacteriaCount}
+              </div>
+            )}
+
+            {/* 菌株詳細列表 - 優化版面 */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              borderRadius: '8px',
+              padding: '12px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '8px'
+            }}>
+              {product.bacteriaDetails.map((bacteria, index) => (
+                <div 
+                  key={index}
+                  style={{
+                    backgroundColor: 'white',
+                    borderRadius: '6px',
+                    padding: '10px',
+                    border: '1px solid #e0e0e0',
+                    transition: 'box-shadow 0.2s ease'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.boxShadow = 'none'}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '8px'
+                  }}>
+                    <span style={{
+                      backgroundColor: '#4caf50',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      flexShrink: 0,
+                      marginTop: '2px'
+                    }}>
+                      {index + 1}
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px'
+                      }}>
+                        <h4 style={{
+                          margin: '0',
+                          color: '#2e7d32',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          lineHeight: '1.2'
+                        }}>
+                          {bacteria.chineseName}
+                        </h4>
+                        <p style={{
+                          margin: '0',
+                          color: '#666',
+                          fontSize: '11px',
+                          fontStyle: 'italic',
+                          lineHeight: '1.2',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {bacteria.scientificName}
+                        </p>
+                        <p style={{
+                          margin: '4px 0 0 0',
+                          color: '#555',
+                          fontSize: '12px',
+                          lineHeight: '1.3',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}>
+                          {bacteria.function}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 產品特色 - 優化版面 */}
+            {product.productFeatures && product.productFeatures.length > 0 && (
+              <div style={{ 
+                marginTop: '12px',
+                padding: '8px',
+                backgroundColor: '#fff8e1',
+                borderRadius: '6px',
+                border: '1px solid #ffe082'
+              }}>
+                <h4 style={{ 
+                  color: '#f57c00', 
+                  marginBottom: '6px',
+                  fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  ✨ 產品特色
+                </h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  {product.productFeatures.slice(0, 6).map((feature, index) => (
+                    <span 
+                      key={index}
+                      style={{
+                        backgroundColor: 'white',
+                        color: '#f57c00',
+                        padding: '2px 6px',
+                        borderRadius: '10px',
+                        fontSize: '11px',
+                        border: '1px solid #ffcc02',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                  {product.productFeatures.length > 6 && (
+                    <span style={{
+                      color: '#f57c00',
+                      fontSize: '11px',
+                      padding: '2px 4px'
+                    }}>
+                      +{product.productFeatures.length - 6} 更多特色
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         
         <div style={{ marginBottom: '20px' }}>
           <h3 style={{ color: '#333', marginBottom: '10px' }}>保健方向</h3>

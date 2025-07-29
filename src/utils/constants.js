@@ -86,29 +86,115 @@ export const INITIAL_PRODUCTS = [
     productCode: '10040',
     warnings: ['嬰幼兒、孕婦、哺餵母乳者如需食用本產品，請洽詢醫師或醫療專業人員']
   },
-  {
-    id: '10050',
-    series: '基本保養系列',
-    name: '康爾喜乳酸菌顆粒',
-    image: '/assets/康爾喜乳酸菌顆粒.png',
-    nutrients: [
-      '乳糖', '玉米澱粉', '果糖粉', '乳酸菌凍乾品', '麥芽糊精', '聚糊精', 
-      '異麥芽寡醣漿', '乙醇', '綜合水果香料', '檸檬酸', 'β-胡蘿蔔素',
-      '13種複合式乳酸菌'
-    ],
-    description: '複合式乳酸菌配方，結合13株菌種優勢，並以專利包埋技術替益生菌穿上防護衣，降低胃酸及膽鹼的破壞，保持乳酸菌的酸化作用及胜肽水解活性，可改變細菌叢生態，調整體質及生理機能，有助於維持健康。',
-    conditions: ['消化改善', '腸道保健', '營養吸收', '免疫調節', '體質調整'],
-    price: 'NT$ 1,890',
-    specifications: '90條／盒',
-    productCode: '10050',
-    bacteriaStrains: [
-      'Lactococcus lactis', 'Bifidobacterium lactis', 'Lactobacillus acidophilus',
-      'Bifidobacterium bifidum', 'Lactobacillus casei', 'Bifidobacterium breve',
-      'Lactobacillus johnsonii', 'Lactobacillus plantarum', 'Lactobacillus rhamnosus GG',
-      'Lactobacillus reuteri', 'Bifidobacterium longum', 'Lactobacillus fermentum',
-      'Lactobacillus paracasei'
-    ]
-  },
+  // 在您的 constants.js 中找到康爾喜乳酸菌顆粒（id: '10050'）的部分
+// 將原有的資料替換為以下完整版本：
+
+{
+  id: '10050',
+  series: '基本保養系列',
+  name: '康爾喜乳酸菌顆粒',
+  image: '/assets/康爾喜乳酸菌顆粒.png',
+  nutrients: [
+    '乳糖', '玉米澱粉', '果糖粉', '乳酸菌凍乾品', '麥芽糊精', '聚糊精', 
+    '異麥芽寡醣漿', '乙醇', '綜合水果香料', '檸檬酸', 'β-胡蘿蔔素',
+    '13種複合式乳酸菌'
+  ],
+  description: '複合式乳酸菌配方，結合13株菌種優勢，並以專利包埋技術替益生菌穿上防護衣，降低胃酸及膽鹼的破壞，保持乳酸菌的酸化作用及胜肽水解活性，可改變細菌叢生態，調整體質及生理機能，有助於維持健康。每條1.5g含以下十三種乳酸菌，出廠活菌數達1000億。',
+  conditions: ['消化改善', '腸道保健', '營養吸收', '免疫調節', '體質調整'],
+  price: 'NT$ 1,890',
+  specifications: '90條／盒',
+  productCode: '10050',
+  bacteriaStrains: [
+    'Lactococcus lactis', 'Bifidobacterium lactis', 'Lactobacillus acidophilus',
+    'Bifidobacterium bifidum', 'Lactobacillus casei', 'Bifidobacterium breve',
+    'Lactobacillus johnsonii', 'Lactobacillus plantarum', 'Lactobacillus rhamnosus GG',
+    'Lactobacillus reuteri', 'Bifidobacterium longum', 'Lactobacillus fermentum',
+    'Lactobacillus paracasei'
+  ],
+  // 新增詳細的菌株資訊
+  bacteriaDetails: [
+    {
+      scientificName: 'Lactococcus lactis',
+      chineseName: '乳酸乳球菌',
+      function: '有利腸道機能的益菌'
+    },
+    {
+      scientificName: 'Bifidobacterium lactis',
+      chineseName: '雷特氏B菌',
+      function: '雙叉桿菌對人體效應之一就是營養作用，能產生丙氨酸、天冬氨酸、和蘇氨酸等氨基酸，可分泌各種酵素'
+    },
+    {
+      scientificName: 'Lactobacillus acidophilus',
+      chineseName: '嗜乳酸桿菌(A菌)',
+      function: '腸胃菌入侵時便率先抑制壞菌，改善有害菌分泌的有毒物質滲透至血液，影響身體健康'
+    },
+    {
+      scientificName: 'Bifidobacterium bifidum',
+      chineseName: '比菲德氏菌(B菌)',
+      function: 'B菌是「人體的清道夫」擁負抗有害菌，清除體內污染，活化免疫的重任'
+    },
+    {
+      scientificName: 'Lactobacillus casei',
+      chineseName: '乾酪乳桿菌(C菌)',
+      function: '能延緩結腸腫瘤的產生，並減少腫瘤的發生率，可增加自然殺手細胞的數量'
+    },
+    {
+      scientificName: 'Bifidobacterium breve',
+      chineseName: '短乳桿菌/酸豆菌',
+      function: '可提升人體自身製造干擾素的能力，加強生產自身的抗抗力及修補因抽菸傷害'
+    },
+    {
+      scientificName: 'Lactobacillus johnsonii',
+      chineseName: '約氏乳桿菌',
+      function: '嬰兒雙歧桿菌在母乳餵養兒腸道內大量存在，對嬰幼兒有許多好處'
+    },
+    {
+      scientificName: 'Lactobacillus plantarum',
+      chineseName: '胚芽乳酸菌',
+      function: '主要存在於各種發酵蔬菜中，可促進消化吸收，減輕腸道激躁症的症狀'
+    },
+    {
+      scientificName: 'Lactobacillus rhamnosus GG',
+      chineseName: '鼠李糖乳桿菌(LGG菌)',
+      function: '可改善急性腹瀉，產生大量的乳酸、醋酸等有機酸，提升免疫系統'
+    },
+    {
+      scientificName: 'Lactobacillus reuteri',
+      chineseName: '洛德乳桿菌(R菌)',
+      function: '可幫助實實腸道細胞的生長，分泌的瑞特素能幫助益菌繁殖'
+    },
+    {
+      scientificName: 'Bifidobacterium longum',
+      chineseName: '長雙歧桿菌(龍根菌)',
+      function: '具發酵產物具有提高動物機體抗氧化能力的作用'
+    },
+    {
+      scientificName: 'Lactobacillus fermentum',
+      chineseName: '發酵乳桿菌',
+      function: '對嬰幼兒有許多好處，如營養、免疫及抗感染作用'
+    },
+    {
+      scientificName: 'Lactobacillus paracasei',
+      chineseName: '副乾酪乳桿菌',
+      function: '改善慢性腹瀉與抗生素相關性腹瀉，緩解便秘，促進人體對乳糖的消化'
+    }
+  ],
+  // 產品特色
+  productFeatures: [
+    '調整體質',
+    '消化道保健', 
+    '調節生理機能',
+    '順暢配方',
+    '單位菌數高',
+    '保存期限長',
+    '份量少',
+    '攜帶方便',
+    '不須冷藏',
+    '適合全家人食用'
+  ],
+  // 菌數資訊
+  bacteriaCount: '每條1.5g含以下十三種乳酸菌，出廠活菌數達1000億'
+},
   {
     id: '10060',
     series: '基本保養系列',
