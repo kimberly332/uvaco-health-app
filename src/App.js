@@ -18,18 +18,65 @@ function App() {
   const [testimonialSearchTerm, setTestimonialSearchTerm] = useState('');
   const [selectedProductFilter, setSelectedProductFilter] = useState('');
   const [productSortBy, setProductSortBy] = useState('default');
+  
+  // 初始化狀態控制 - 防止重複初始化
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const { documents: products, loading: productsLoading, addDocument: addProduct } = useProducts();
   const { documents: testimonials, loading: testimonialsLoading, addDocument: addTestimonial } = useTestimonials();
 
-  // 初始化產品資料
-  useEffect(() => {
-    if (!productsLoading && products.length === 0) {
-      INITIAL_PRODUCTS.forEach(product => {
-        addProduct(product);
-      });
+  // 產品去重工具函數
+  const removeDuplicateProducts = useCallback((products) => {
+    const uniqueProducts = [];
+    const seenIds = new Set();
+    
+    for (const product of products) {
+      if (!seenIds.has(product.id)) {
+        seenIds.add(product.id);
+        uniqueProducts.push(product);
+      }
     }
-  }, [productsLoading, products.length, addProduct]);
+    
+    return uniqueProducts;
+  }, []);
+
+  // 修復後的初始化產品資料邏輯
+  useEffect(() => {
+    const initializeProducts = async () => {
+      if (!productsLoading && !hasInitialized) {
+        console.log('檢查產品資料初始化狀態...');
+        
+        // 先去重現有產品
+        const uniqueExistingProducts = removeDuplicateProducts(products);
+        
+        // 檢查是否需要初始化
+        if (uniqueExistingProducts.length === 0) {
+          console.log('開始初始化產品資料...');
+          
+          // 批量添加產品，避免重複
+          for (const product of INITIAL_PRODUCTS) {
+            const exists = uniqueExistingProducts.some(p => p.id === product.id);
+            if (!exists) {
+              try {
+                await addProduct(product);
+                console.log(`成功添加產品: ${product.name}`);
+              } catch (error) {
+                console.error(`添加產品 ${product.name} 失敗:`, error);
+              }
+            }
+          }
+          
+          console.log('產品資料初始化完成');
+        } else {
+          console.log(`發現現有產品 ${uniqueExistingProducts.length} 個，跳過初始化`);
+        }
+        
+        setHasInitialized(true);
+      }
+    };
+
+    initializeProducts();
+  }, [productsLoading, products, addProduct, hasInitialized, removeDuplicateProducts]);
 
   // 獲取特定產品的見證
   const getTestimonialsForProduct = useCallback((productId) => {
@@ -41,14 +88,16 @@ function App() {
     return testimonials.filter(t => t.productId === productId).length;
   }, [testimonials]);
 
-  // 產品搜尋和排序過濾邏輯
+  // 產品搜尋和排序過濾邏輯 - 加入去重保護
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = products;
+    // 先去重，再進行搜尋和排序
+    let uniqueProducts = removeDuplicateProducts(products);
+    let filtered = uniqueProducts;
     
     // 先進行搜尋過濾
     if (productSearchTerm) {
       const searchLower = productSearchTerm.toLowerCase();
-      filtered = products.filter(product => 
+      filtered = uniqueProducts.filter(product => 
         product.name.toLowerCase().includes(searchLower) ||
         product.series.toLowerCase().includes(searchLower) ||
         product.description.toLowerCase().includes(searchLower) ||
@@ -110,7 +159,7 @@ function App() {
       default:
         return sortedProducts;
     }
-  }, [products, productSearchTerm, productSortBy, testimonials]);
+  }, [products, productSearchTerm, productSortBy, testimonials, removeDuplicateProducts]);
 
   // 見證搜尋和篩選邏輯
   const filteredTestimonials = useMemo(() => {
@@ -177,6 +226,8 @@ function App() {
     setSelectedProductFilter('');
   };
 
+
+
   if (productsLoading || testimonialsLoading) {
     return (
       <div className="loading-container">
@@ -223,7 +274,7 @@ function App() {
 
             {/* 搜尋結果統計 */}
             <SearchResults
-              totalCount={products.length}
+              totalCount={removeDuplicateProducts(products).length}
               filteredCount={filteredAndSortedProducts.length}
               searchTerm={productSearchTerm}
               type="產品"
@@ -291,7 +342,7 @@ function App() {
               onSearchChange={setTestimonialSearchTerm}
               selectedProduct={selectedProductFilter}
               onProductChange={setSelectedProductFilter}
-              products={products}
+              products={removeDuplicateProducts(products)}
               onClearFilters={handleClearTestimonialFilters}
             />
 
@@ -360,27 +411,27 @@ function App() {
         {currentView === 'add-testimonial' && (
           <TestimonialForm 
             selectedProduct={selectedProduct}
-            products={products}
+            products={removeDuplicateProducts(products)}
             onSubmit={handleSubmitTestimonial}
             onCancel={handleCancelTestimonial}
           />
         )}
       </main>
       
-     <nav className="app-nav">
-      <button 
-        onClick={() => setCurrentView('products')}
-        className={currentView === 'products' || currentView === 'product-detail' ? 'active' : ''}
-      >
-        產品介紹
-      </button>
-      <button 
-        onClick={() => setCurrentView('testimonials')}
-        className={currentView === 'testimonials' || currentView === 'add-testimonial' ? 'active' : ''}
-      >
-        心得分享
-      </button>
-    </nav>
+      <nav className="app-nav">
+        <button 
+          onClick={() => setCurrentView('products')}
+          className={currentView === 'products' || currentView === 'product-detail' ? 'active' : ''}
+        >
+          產品介紹
+        </button>
+        <button 
+          onClick={() => setCurrentView('testimonials')}
+          className={currentView === 'testimonials' || currentView === 'add-testimonial' ? 'active' : ''}
+        >
+          心得分享
+        </button>
+      </nav>
     </div>
   );
 }
