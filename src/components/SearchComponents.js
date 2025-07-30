@@ -221,17 +221,37 @@ export const TestimonialFilter = ({
 
 // 搜尋結果統計組件
 export const SearchResults = ({ totalCount, filteredCount, searchTerm, type = '產品' }) => {
-  if (!searchTerm && filteredCount === totalCount) return null;
+  // 確保數值有效
+  const safeTotal = totalCount || 0;
+  const safeFiltered = filteredCount || 0;
+  
+  // 如果數據還在載入中
+  if (safeTotal === 0) {
+    return (
+      <div style={{
+        padding: '10px 15px',
+        backgroundColor: '#f8f9fa',
+        color: '#6c757d',
+        borderRadius: '6px',
+        marginBottom: '15px',
+        fontSize: '14px',
+        border: '1px solid #dee2e6',
+        textAlign: 'center'
+      }}>
+        ⏳ 載入中...
+      </div>
+    );
+  }
 
   return (
     <div style={{
       padding: '10px 15px',
-      backgroundColor: filteredCount > 0 ? '#e3f2fd' : '#fff3cd',
-      color: filteredCount > 0 ? '#1976d2' : '#856404',
+      backgroundColor: safeFiltered > 0 ? '#e3f2fd' : '#fff3cd',
+      color: safeFiltered > 0 ? '#1976d2' : '#856404',
       borderRadius: '6px',
       marginBottom: '15px',
       fontSize: '14px',
-      border: `1px solid ${filteredCount > 0 ? '#bbdefb' : '#ffeaa7'}`,
+      border: `1px solid ${safeFiltered > 0 ? '#bbdefb' : '#ffeaa7'}`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between'
@@ -239,16 +259,16 @@ export const SearchResults = ({ totalCount, filteredCount, searchTerm, type = '�
       <div>
         {searchTerm && searchTerm !== '篩選條件' ? (
           <span>
-            🔍 搜尋 "<strong>{searchTerm}</strong>" 找到 <strong>{filteredCount}</strong> 個{type}
+            🔍 搜尋 "<strong>{searchTerm}</strong>" 找到 <strong>{safeFiltered}</strong> 個{type}
           </span>
         ) : (
           <span>
-            📊 篩選結果：<strong>{filteredCount}</strong> / {totalCount} 個{type}
+            📊 總共顯示：<strong>{safeFiltered}</strong> / {safeTotal} 個{type}
           </span>
         )}
       </div>
       
-      {filteredCount === 0 && (
+      {safeFiltered === 0 && searchTerm && (
         <div style={{ fontSize: '20px' }}>😅</div>
       )}
     </div>
