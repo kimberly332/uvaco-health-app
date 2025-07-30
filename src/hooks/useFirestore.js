@@ -10,6 +10,30 @@ import {
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
+// 輔助函數：轉換 Firestore 時間戳記為可讀字串
+const formatFirestoreTimestamp = (timestamp) => {
+  if (!timestamp) return new Date().toISOString().split('T')[0];
+  
+  // 如果是 Firestore Timestamp 物件
+  if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toISOString().split('T')[0];
+  }
+  
+  // 如果是 JavaScript Date 物件
+  if (timestamp instanceof Date) {
+    return timestamp.toISOString().split('T')[0];
+  }
+  
+  // 如果是字串，直接返回
+  if (typeof timestamp === 'string') {
+    return timestamp;
+  }
+  
+  // 默認返回今天的日期
+  return new Date().toISOString().split('T')[0];
+};
+
 export const useFirestore = (collectionName) => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,8 +57,10 @@ export const useFirestore = (collectionName) => {
               docs.push({ 
                 id: doc.id, 
                 ...data,
-                // 確保 createdAt 有正確的格式
-                createdAt: data.createdAt || new Date()
+                // 修復：正確處理 Firestore 時間戳記
+                createdAt: formatFirestoreTimestamp(data.createdAt),
+                // 如果有其他時間欄位，也要處理
+                updatedAt: data.updatedAt ? formatFirestoreTimestamp(data.updatedAt) : undefined
               });
             });
             setDocuments(docs);

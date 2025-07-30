@@ -80,12 +80,26 @@ function App() {
 
   // 獲取特定產品的見證
   const getTestimonialsForProduct = useCallback((productId) => {
-    return testimonials.filter(t => t.productId === productId);
+    return testimonials.filter(testimonial => {
+      // 支援新版多產品格式
+      if (testimonial.productIds && Array.isArray(testimonial.productIds)) {
+        return testimonial.productIds.includes(productId);
+      }
+      // 兼容舊版單產品格式
+      return testimonial.productId === productId;
+    });
   }, [testimonials]);
 
   // 獲取產品的見證數量
   const getTestimonialCountForProduct = useCallback((productId) => {
-    return testimonials.filter(t => t.productId === productId).length;
+    return testimonials.filter(testimonial => {
+      // 支援新版多產品格式
+      if (testimonial.productIds && Array.isArray(testimonial.productIds)) {
+        return testimonial.productIds.includes(productId);
+      }
+      // 兼容舊版單產品格式
+      return testimonial.productId === productId;
+    }).length;
   }, [testimonials]);
 
   // 產品搜尋和排序過濾邏輯 - 加入去重保護
@@ -163,28 +177,27 @@ function App() {
 
   // 見證搜尋和篩選邏輯
   const filteredTestimonials = useMemo(() => {
-    let filtered = testimonials;
+    return testimonials.filter(testimonial => {
+      const matchesSearch = !testimonialSearchTerm || 
+        testimonial.story?.toLowerCase().includes(testimonialSearchTerm.toLowerCase()) ||
+        testimonial.userName?.toLowerCase().includes(testimonialSearchTerm.toLowerCase()) ||
+        testimonial.displayName?.toLowerCase().includes(testimonialSearchTerm.toLowerCase()) ||
+        // 支援在產品名稱中搜尋（新版多產品）
+        (testimonial.productNames && testimonial.productNames.some(name => 
+          name.toLowerCase().includes(testimonialSearchTerm.toLowerCase())
+        )) ||
+        // 兼容舊版單產品搜尋
+        testimonial.productName?.toLowerCase().includes(testimonialSearchTerm.toLowerCase());
 
-    // 按產品篩選
-    if (selectedProductFilter) {
-      filtered = filtered.filter(testimonial => 
-        testimonial.productId === selectedProductFilter
-      );
-    }
+      const matchesProduct = !selectedProductFilter || 
+        // 支援新版多產品篩選
+        (testimonial.productIds && testimonial.productIds.includes(selectedProductFilter)) ||
+        // 兼容舊版單產品篩選
+        testimonial.productId === selectedProductFilter;
 
-    // 按搜尋詞篩選
-    if (testimonialSearchTerm) {
-      const searchLower = testimonialSearchTerm.toLowerCase();
-      filtered = filtered.filter(testimonial =>
-        testimonial.story.toLowerCase().includes(searchLower) ||
-        testimonial.userName.toLowerCase().includes(searchLower) ||
-        testimonial.productName.toLowerCase().includes(searchLower) ||
-        (testimonial.system && testimonial.system.toLowerCase().includes(searchLower))
-      );
-    }
-
-    return filtered;
-  }, [testimonials, selectedProductFilter, testimonialSearchTerm]);
+      return matchesSearch && matchesProduct;
+    });
+  }, [testimonials, testimonialSearchTerm, selectedProductFilter]);
 
   const handleViewProductDetails = (product) => {
     setSelectedProduct(product);
@@ -203,8 +216,11 @@ function App() {
 
   const handleSubmitTestimonial = async (testimonial) => {
     try {
+      // 為每個選中的產品建立關聯
       await addTestimonial(testimonial);
-      alert('見證分享成功！');
+      
+      alert('感謝您的分享！您的使用心得已成功提交。');
+      setSelectedProduct(null);
       setCurrentView('testimonials');
     } catch (error) {
       alert('分享失敗，請稍後再試');
