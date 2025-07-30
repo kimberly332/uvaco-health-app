@@ -184,7 +184,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
 
     try {
       const testimonial = {
-        id: Date.now(),
+        // id: Date.now(),
         ...formData,
         displayName: formData.namePrefix || (formData.isNamePublic ? formData.userName : '匿名用戶'),
         // 新增權限相關欄位
