@@ -321,8 +321,8 @@ export const INITIAL_PRODUCTS = [
   {
     id: '40090',
     series: '清除系列',
-    name: '葡眾寧康福膠囊',
-    image: '/assets/葡眾寧康福膠囊.png',
+    name: '寧康福膠囊',
+    image: '/assets/寧康福膠囊.png',
     nutrients: [
       '桑黃菌絲體發酵液粉(Phellinus linteus)', '蛹蟲草菌絲體發酵液粉(Cordyceps militaris)',
       '初乳粉', '微結晶狀α-纖維素', '綠茶萃取物', '硬脂酸鎂', '二氧化矽', '墨角藻萃取粉'
