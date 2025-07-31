@@ -324,7 +324,7 @@ function AppContent() {
       <main className="app-main">
         {currentView === 'products' && (
           <div>
-            <h2>產品介紹</h2>
+            {/* <h2>產品介紹</h2> */}
             
             <ProductSearch
               searchTerm={productSearchTerm}
@@ -376,7 +376,7 @@ function AppContent() {
         {currentView === 'testimonials' && (
           <ProtectedComponent permission="view_testimonials">
             <div>
-              <h2>用戶心得分享</h2>
+              {/* <h2>用戶心得分享</h2> */}
               
               <ProtectedComponent permission="submit_testimonial">
                 <button 
@@ -471,14 +471,14 @@ function AppContent() {
           onClick={() => setCurrentView('products')}
           className={currentView === 'products' || currentView === 'product-detail' ? 'active' : ''}
         >
-          📦 產品介紹
+          產品介紹
         </button>
         <ProtectedComponent permission="view_testimonials">
           <button 
             onClick={() => setCurrentView('testimonials')}
             className={currentView === 'testimonials' || currentView === 'add-testimonial' ? 'active' : ''}
           >
-            💬 心得分享
+            心得分享
           </button>
         </ProtectedComponent>
       </nav>

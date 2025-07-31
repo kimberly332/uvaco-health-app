@@ -93,7 +93,7 @@ const UserManager = ({ onUserChange, currentUser }) => {
               onClick={() => setShowUserForm(false)}
               style={{
                 padding: '8px 12px',
-                backgroundColor: '#6c757d',
+                backgroundColor: '#9ca3af',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',

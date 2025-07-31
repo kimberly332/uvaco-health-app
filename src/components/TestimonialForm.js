@@ -567,7 +567,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: '#6c757d',
+              backgroundColor: '#9ca3af',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
