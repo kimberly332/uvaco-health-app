@@ -5,10 +5,10 @@
 /* CSS Variables for Design System */
 :root {
   /* Colors */
-  --primary-color: #007bff;
-  --primary-hover: #0056b3;
-  --secondary-color: #28a745;
-  --secondary-hover: #218838;
+  --primary-color: #8fbc8f;
+  --primary-hover: #7ba57b;
+  --secondary-color: #a8956f;
+  --secondary-hover: #95825f;
   --accent-color: #6c757d;
   --danger-color: #dc3545;
   --warning-color: #ffc107;
@@ -249,11 +249,6 @@ body {
   overflow: hidden;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
 .card-padding {
   padding: var(--space-4);
 }
@@ -290,7 +285,7 @@ body {
   position: absolute;
   top: var(--space-3);
   right: var(--space-3);
-  background-color: var(--secondary-color);
+  background-color: #d4b97a;
   color: var(--white);
   border-radius: var(--radius-full);
   padding: var(--space-1) var(--space-3);
@@ -299,7 +294,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  box-shadow: var(--shadow-sm);
+  /* box-shadow: var(--shadow-sm); */
   z-index: 1;
 }
 
@@ -604,8 +599,8 @@ body {
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  /* transform: translateY(-1px);
+  box-shadow: var(--shadow-md); */
 }
 
 .btn-secondary {
@@ -615,8 +610,8 @@ body {
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--secondary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  /* transform: translateY(-1px);
+  box-shadow: var(--shadow-md); */
 }
 
 .btn-outline {
@@ -678,8 +673,8 @@ body {
 .app-nav button.active {
   background-color: var(--primary-color);
   color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  /* transform: translateY(-2px); */
+  /* box-shadow: var(--shadow-md); */
 }
 
 .app-nav button:hover:not(.active) {
@@ -715,20 +710,6 @@ body {
 .nav-btn:hover:not(.active) {
   background-color: var(--gray-100);
   color: var(--gray-800);
-}
-
-/* Special Buttons */
-.btn-add-testimonial {
-  background: linear-gradient(135deg, var(--secondary-color), #34ce57);
-  color: var(--white);
-  border-radius: var(--radius-full);
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--space-4);
-}
-
-.btn-add-testimonial:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(40, 167, 69, 0.3);
 }
 
 .btn-back {
@@ -966,11 +947,6 @@ body {
   
   .product-card {
     transition: transform var(--transition-base), box-shadow var(--transition-base);
-  }
-  
-  .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
   }
   
   .search-input,

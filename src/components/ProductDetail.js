@@ -21,15 +21,17 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
       <button 
         onClick={onBack}
         style={{
-          background: 'none',
+          padding: '12px',
+          backgroundColor: '#9ca3af',
+          color: 'white',
           border: 'none',
-          fontSize: '18px',
+          borderRadius: '6px',
+          fontSize: '16px',
           cursor: 'pointer',
-          marginBottom: '15px',
-          color: '#007bff'
+          marginBottom: '20px'
         }}
       >
-        ← 返回產品列表
+        返回產品列表
       </button>
       
       <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px' }}>
@@ -49,7 +51,7 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
           <strong>系列：</strong>{product.series}
         </p>
         <p style={{ 
-          color: '#007bff', 
+          color: '#8fbc8f', 
           fontSize: '20px', 
           fontWeight: 'bold',
           marginBottom: '20px'
@@ -351,7 +353,7 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
           style={{
             width: '100%',
             padding: '12px',
-            backgroundColor: '#28a745',
+            backgroundColor: '#a8956f',
             color: 'white',
             border: 'none',
             borderRadius: '6px',
@@ -374,7 +376,7 @@ const ProductDetail = ({ product, testimonials, onBack, onAddTestimonial }) => {
         }}>
           用戶心得分享
           <span style={{ 
-            backgroundColor: '#007bff',
+            backgroundColor: '#8fbc8f',
             color: 'white',
             padding: '4px 8px',
             borderRadius: '12px',

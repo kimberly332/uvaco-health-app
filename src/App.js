@@ -270,7 +270,7 @@ function AppContent() {
       <header className="app-header">
         <div className="header-content">
           <img src="/logo.svg" alt="UVACO 標誌" className="logo" />
-          <h1>UVACO 健康專區</h1>
+          <h1>UVACO</h1>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ 
               fontSize: '14px', 
@@ -287,7 +287,7 @@ function AppContent() {
                 onClick={() => setShowAdminPanel(true)}
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: '#dc3545',
+                  backgroundColor: '#9bb8c4',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -295,17 +295,9 @@ function AppContent() {
                   cursor: 'pointer',
                   transition: 'all 0.3s'
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#c82333';
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#dc3545';
-                  e.target.style.transform = 'translateY(0)';
-                }}
                 title="管理員控制台"
               >
-                ⚙️ 管理
+                管理
               </button>
             )}
             
@@ -313,7 +305,7 @@ function AppContent() {
               onClick={logout}
               style={{
                 padding: '8px 12px',
-                backgroundColor: '#95a5a6',
+                backgroundColor: '#9ca3af',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -321,17 +313,9 @@ function AppContent() {
                 cursor: 'pointer',
                 transition: 'all 0.3s'
               }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#7f8c8d';
-                e.target.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#95a5a6';
-                e.target.style.transform = 'translateY(0)';
-              }}
               title="登出"
             >
-              🚪 登出
+              登出
             </button>
           </div>
         </div>
@@ -397,9 +381,19 @@ function AppContent() {
               <ProtectedComponent permission="submit_testimonial">
                 <button 
                   onClick={() => handleAddTestimonial()}
-                  className="btn btn-success btn-add-testimonial btn-full"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#a8956f',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    marginBottom: '20px'
+                  }}
                 >
-                  ✍️ 分享我的使用心得
+                  💬 分享我的使用心得
                 </button>
               </ProtectedComponent>
 

@@ -117,7 +117,7 @@ const LoginComponent = ({ onLoginSuccess }) => {
                   backgroundColor: isLoading ? '#f8f9fa' : 'white',
                   boxSizing: 'border-box'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#007bff'}
+                onFocus={(e) => e.target.style.borderColor = '#8fbc8f'}
                 onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
               />
               <button
@@ -162,7 +162,7 @@ const LoginComponent = ({ onLoginSuccess }) => {
             style={{
               width: '100%',
               padding: '14px',
-              backgroundColor: (isLoading || !password.trim()) ? '#ccc' : '#007bff',
+              backgroundColor: (isLoading || !password.trim()) ? '#ccc' : '#8fbc8f',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -172,7 +172,7 @@ const LoginComponent = ({ onLoginSuccess }) => {
               transition: 'background-color 0.3s'
             }}
           >
-            {isLoading ? '驗證中...' : '🔐 進入系統'}
+            {isLoading ? '驗證中...' : '進入系統'}
           </button>
         </form>
 

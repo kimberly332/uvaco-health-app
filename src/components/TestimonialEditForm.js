@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+// components/TestimonialEditForm.js
+import React, { useState, useEffect } from 'react';
 
-const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
-  // 必須先調用所有的 useState Hook
+const TestimonialEditForm = ({ testimonial, products, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    productIds: selectedProduct ? [selectedProduct.id] : [], // 改為陣列支援多選
-    productNames: selectedProduct ? [selectedProduct.name] : [], // 對應的產品名稱陣列
+    productIds: [],
+    productNames: [],
     userName: '',
-    namePrefix: '', // 新增：姓名前綴（如：我的夥伴、朋友等）
+    namePrefix: '',
     isNamePublic: true,
     duration: '',
     story: '',
@@ -16,59 +15,14 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warningWords, setWarningWords] = useState([]);
-  const [productSearchTerm, setProductSearchTerm] = useState(''); // 產品搜尋功能
+  const [productSearchTerm, setProductSearchTerm] = useState('');
 
-  // 權限檢查 Hook（在所有useState之後）
-  const { checkPermission, getRoleDisplayName } = useAuth();
-  
-  // 權限檢查移到useState之後
-  const hasPermission = checkPermission('submit_testimonial');
-  
-  // 如果沒有權限，返回權限不足提示（保持簡潔的UI風格）
-  if (!hasPermission) {
-    return (
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '50px 20px',
-          backgroundColor: '#fff3cd',
-          borderRadius: '8px',
-          border: '1px solid #ffeaa7'
-        }}>
-          <h3 style={{ color: '#856404', marginBottom: '15px' }}>
-            ⚠️ 權限不足
-          </h3>
-          <p style={{ color: '#856404', marginBottom: '20px' }}>
-            您當前的身份（{getRoleDisplayName()}）沒有提交見證的權限
-          </p>
-          <button
-            onClick={onCancel}
-            style={{
-              padding: '12px 20px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}
-          >
-            返回
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // 敏感詞彙檢測（擴展版，包含傳銷相關詞彙）
+  // 敏感詞彙檢測
   const sensitiveWords = [
     '有效', '無效', '治療', '治好', '治癒', '療效', '藥效', '痊癒', '康復', 
     '根治', '徹底解決', '預防疾病', '診斷', '減輕症狀', '消除病症', 
     '醫療級', '臨床證實', '100%', '完全', '立即見效', '保證', '確保', 
-    '永久', '終身',
-    // 新增傳銷相關敏感詞
-    '下線', '上線', '推薦獎金', '分潤', '佣金', '代理', '加盟',
-    '拉人頭', '多層次', '傳銷', '直銷'
+    '永久', '終身'
   ];
 
   // 常用的姓名前綴選項
@@ -82,6 +36,40 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
     { value: '長輩', label: '長輩' },
     { value: '朋友的朋友', label: '朋友的朋友' }
   ];
+
+  // 初始化表單資料
+  useEffect(() => {
+    if (testimonial) {
+      // 解析顯示名稱
+      let namePrefix = '';
+      let userName = '';
+      
+      if (testimonial.displayName) {
+        const prefixOptions = namePrefixOptions.map(opt => opt.value).filter(val => val !== '');
+        const foundPrefix = prefixOptions.find(prefix => testimonial.displayName.startsWith(prefix));
+        
+        if (foundPrefix) {
+          namePrefix = foundPrefix;
+          userName = testimonial.displayName.replace(foundPrefix, '').trim();
+        } else {
+          userName = testimonial.displayName;
+        }
+      } else {
+        userName = testimonial.userName || '';
+      }
+
+      setFormData({
+        productIds: testimonial.productIds || (testimonial.productId ? [testimonial.productId] : []),
+        productNames: testimonial.productNames || (testimonial.productName ? [testimonial.productName] : []),
+        userName: userName,
+        namePrefix: namePrefix,
+        isNamePublic: testimonial.isNamePublic !== false,
+        duration: testimonial.duration || '',
+        story: testimonial.story || '',
+        system: testimonial.system || ''
+      });
+    }
+  }, [testimonial]);
 
   // 過濾產品（根據搜尋詞）
   const filteredProducts = products.filter(product =>
@@ -171,11 +159,11 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
       return;
     }
 
-    // 檢查是否有敏感詞彙（加強版警告）
+    // 檢查是否有敏感詞彙
     const foundSensitiveWords = checkSensitiveWords(formData.story);
     if (foundSensitiveWords.length > 0) {
       const confirmSubmit = window.confirm(
-        `⚠️ 內容審核提醒\n\n您的內容中包含以下詞彙：${foundSensitiveWords.join('、')}\n\n為符合法規要求，建議修改為個人體驗描述，例如：\n• "感受到身體有改善"\n• "使用後覺得比較舒服"\n• "個人覺得有幫助"\n\n您確定要繼續提交嗎？\n（提交後將由管理員進行內容審核）`
+        `您的內容中包含以下詞彙：${foundSensitiveWords.join('、')}\n\n為避免法規問題，建議修改為個人體驗描述。\n\n您確定要繼續提交嗎？`
       );
       if (!confirmSubmit) return;
     }
@@ -183,21 +171,15 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
     setIsSubmitting(true);
 
     try {
-      const testimonial = {
-        // id: Date.now(),
+      const updatedTestimonial = {
         ...formData,
         displayName: formData.namePrefix || (formData.isNamePublic ? formData.userName : '匿名用戶'),
-        // 新增權限相關欄位
-        submittedBy: getRoleDisplayName(), // 記錄提交者身份
-        needsReview: foundSensitiveWords.length > 0, // 標記是否需要審核
-        sensitiveWords: foundSensitiveWords, // 記錄檢測到的敏感詞
-        isApproved: foundSensitiveWords.length === 0 // 無敏感詞彙的自動通過
       };
       
-      await onSubmit(testimonial);
+      await onSubmit(testimonial.id, updatedTestimonial);
     } catch (error) {
-      console.error('提交見證時發生錯誤:', error);
-      alert('提交失敗，請稍後再試');
+      console.error('更新見證時發生錯誤:', error);
+      alert('更新失敗，請稍後再試');
     } finally {
       setIsSubmitting(false);
     }
@@ -206,61 +188,39 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-        分享使用心得
+        ✏️ 編輯使用心得
       </h2>
       
-      {/* 身份識別提醒（新增，但保持簡潔風格） */}
-      <div style={{ 
-        marginBottom: '20px', 
-        padding: '12px',
-        backgroundColor: '#e8f4f8',
-        border: '1px solid #bee5eb',
-        borderRadius: '6px',
-        fontSize: '14px',
-        color: '#0c5460'
-      }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-          👤 當前身份：{getRoleDisplayName()}
-        </div>
-        <div style={{ fontSize: '13px' }}>
-          您的見證將記錄提交者身份，便於內容管理
-        </div>
-      </div>
-      
-      {/* 法規提醒區塊（保持原樣） */}
+      {/* 編輯提醒區塊 */}
       <div style={{ 
         marginBottom: '25px', 
         padding: '15px',
-        backgroundColor: '#fff3cd',
-        border: '1px solid #ffeaa7',
+        backgroundColor: '#e3f2fd',
+        border: '1px solid #bbdefb',
         borderRadius: '6px',
         fontSize: '14px',
-        color: '#856404'
+        color: '#1565c0'
       }}>
         <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
-          ⚠️ 重要提醒
+          ✏️ 編輯模式
         </div>
         <ul style={{ margin: '5px 0', paddingLeft: '20px', lineHeight: '1.5' }}>
-          <li>請分享您的個人使用體驗和感受</li>
-          <li>請避免使用醫療功效相關詞彙（如：有效、治療、療效等）</li>
-          <li>建議使用「個人感受」、「使用體驗」、「有改善」等詞彙</li>
-          <li>支援多種產品組合搭配的見證分享</li>
-          <li><strong>含敏感詞彙的內容將進入審核流程</strong></li>
+          <li>您正在編輯現有的使用心得</li>
+          <li>請確認資料的準確性</li>
+          <li>編輯後將顯示「已編輯」標記</li>
+          <li>請繼續避免使用醫療功效相關詞彙</li>
         </ul>
       </div>
 
       <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px' }}>
         
-        {/* 產品多選區塊（保持原來的UI） */}
+        {/* 產品多選區塊 */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>
             搭配產品組合 <span style={{ color: '#dc3545' }}>*</span>
-            <span style={{ fontSize: '14px', color: '#666', fontWeight: 'normal' }}>
-              （可選擇多個產品）
-            </span>
           </label>
           
-          {/* 產品搜尋 - 簡潔版 */}
+          {/* 產品搜尋 */}
           <div style={{ marginBottom: '15px' }}>
             <input
               type="text"
@@ -280,7 +240,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             )}
           </div>
 
-          {/* 已選擇的產品顯示 - 簡潔版 */}
+          {/* 已選擇的產品顯示 */}
           {formData.productIds.length > 0 && (
             <div style={{ 
               marginBottom: '20px',
@@ -338,7 +298,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             </div>
           )}
           
-          {/* 產品選擇清單 - 移除懸停效果版 */}
+          {/* 產品選擇清單 */}
           <div style={{ 
             maxHeight: '300px', 
             overflowY: 'auto', 
@@ -409,11 +369,10 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           </div>
         </div>
 
-        {/* 姓名輸入優化 - 根據分享類型調整（保持原UI） */}
+        {/* 姓名輸入 */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>分享者資訊 <span style={{ color: '#dc3545' }}>*</span></label>
           
-          {/* 分享類型選擇 */}
           <div style={{ marginBottom: '10px' }}>
             <select
               value={formData.namePrefix}
@@ -421,7 +380,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
                 setFormData({
                   ...formData, 
                   namePrefix: e.target.value,
-                  userName: '' // 清空姓名，重新輸入
+                  userName: e.target.value === '' ? formData.userName : ''
                 });
               }}
               style={{
@@ -437,7 +396,6 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             </select>
           </div>
 
-          {/* 只有本人分享才需要輸入姓名 */}
           {formData.namePrefix === '' && (
             <div>
               <input 
@@ -462,7 +420,6 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
             </div>
           )}
 
-          {/* 其他分享類型的說明 */}
           {formData.namePrefix !== '' && (
             <div style={{ 
               padding: '12px', 
@@ -497,7 +454,7 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           <textarea 
             value={formData.story}
             onChange={handleStoryChange}
-            placeholder="請詳細分享您的使用體驗，包括使用前後的感受變化等...（請避免使用醫療功效詞彙）"
+            placeholder="請詳細分享您的使用體驗..."
             rows="6"
             style={{
               ...inputStyle,
@@ -521,23 +478,6 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
               </span>
             )}
           </div>
-          
-          {/* 詞彙建議 */}
-          {warningWords.length > 0 && (
-            <div style={{ 
-              marginTop: '10px',
-              padding: '10px',
-              backgroundColor: '#fff3cd',
-              borderRadius: '4px',
-              fontSize: '13px',
-              color: '#856404'
-            }}>
-              <strong>建議替代詞彙：</strong><br/>
-              • 「有效」→「有改善」、「感受到變化」<br/>
-              • 「治療」→「使用後感覺」、「個人體驗」<br/>
-              • 「療效」→「使用心得」、「個人感受」
-            </div>
-          )}
         </div>
         
         <div style={{ 
@@ -545,22 +485,6 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
           gap: '10px',
           marginTop: '30px'
         }}>
-          <button 
-            onClick={handleSubmit}
-            disabled={isSubmitting || formData.productIds.length === 0 || !formData.story || (formData.namePrefix === '' && !formData.userName)}
-            style={{
-              flex: 1,
-              padding: '12px',
-              backgroundColor: (isSubmitting || formData.productIds.length === 0 || !formData.story || (formData.namePrefix === '' && !formData.userName)) ? '#ccc' : '#a8956f',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: (isSubmitting || formData.productIds.length === 0 || !formData.story || (formData.namePrefix === '' && !formData.userName)) ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {isSubmitting ? '提交中...' : '✓ 提交心得分享'}
-          </button>
           <button 
             onClick={onCancel}
             disabled={isSubmitting}
@@ -575,33 +499,12 @@ const TestimonialForm = ({ selectedProduct, products, onSubmit, onCancel }) => {
               cursor: isSubmitting ? 'not-allowed' : 'pointer'
             }}
           >
-            取消
+            取消編輯
           </button>
         </div>
-      </div>
-      
-      {/* 更新後的法規聲明（保持原樣，只加了一行） */}
-      <div style={{ 
-        marginTop: '20px', 
-        padding: '15px',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '6px',
-        fontSize: '13px',
-        color: '#666',
-        lineHeight: '1.5'
-      }}>
-        <strong>法規聲明：</strong>
-        <ul style={{ margin: '8px 0', paddingLeft: '18px' }}>
-          <li>以上為個人使用體驗分享，不代表產品功效</li>
-          <li>每個人使用感受可能不同，實際效果因人而異</li>
-          <li>本產品不具醫療功效，不可取代正規醫療</li>
-          <li>如有健康疑慮，請諮詢專業醫師</li>
-          <li>支援多種產品搭配使用的綜合見證分享</li>
-          <li><strong>包含敏感詞彙的內容將由管理員審核後發布</strong></li>
-        </ul>
       </div>
     </div>
   );
 };
 
-export default TestimonialForm;
+export default TestimonialEditForm;

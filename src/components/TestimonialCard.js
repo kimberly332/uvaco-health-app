@@ -26,7 +26,7 @@ const TestimonialCard = ({ testimonial }) => {
       borderRadius: '8px', 
       marginBottom: '15px',
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      borderLeft: '4px solid #28a745'
+      borderLeft: '4px solid #a8956f'
     }}>
       <div style={{ 
         display: 'flex', 
@@ -116,7 +116,7 @@ const TestimonialCard = ({ testimonial }) => {
         backgroundColor: '#f8f9fa', 
         padding: '12px', 
         borderRadius: '6px',
-        borderLeft: '4px solid #28a745',
+        borderLeft: '4px solid #a8956f',
         position: 'relative'
       }}>
         {/* 引號裝飾 */}
@@ -125,7 +125,7 @@ const TestimonialCard = ({ testimonial }) => {
           top: '5px',
           left: '5px',
           fontSize: '20px',
-          color: '#28a745',
+          color: '#a8956f',
           opacity: 0.3
         }}>
           "
@@ -146,7 +146,7 @@ const TestimonialCard = ({ testimonial }) => {
           bottom: '5px',
           right: '8px',
           fontSize: '20px',
-          color: '#28a745',
+          color: '#a8956f',
           opacity: 0.3
         }}>
           "

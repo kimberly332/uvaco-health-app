@@ -37,7 +37,7 @@ const ProductCard = ({ product, onViewDetails, testimonialCount = 0 }) => {
           <span>👥 用戶見證</span>
         </div>
         <div style={{ 
-          color: testimonialCount > 0 ? '#28a745' : '#999',
+          color: testimonialCount > 0 ? '#d4b97a' : '#999',
           fontWeight: 'bold'
         }}>
           {testimonialCount > 0 ? (

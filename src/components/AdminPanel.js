@@ -220,7 +220,7 @@ const AdminPanel = ({ onClose }) => {
             style={{
               padding: '15px 20px',
               border: 'none',
-              backgroundColor: activeTab === 'testimonials' ? '#007bff' : 'transparent',
+              backgroundColor: activeTab === 'testimonials' ? '#8fbc8f' : 'transparent',
               color: activeTab === 'testimonials' ? 'white' : '#666',
               cursor: 'pointer',
               fontSize: '14px',
@@ -236,7 +236,7 @@ const AdminPanel = ({ onClose }) => {
               style={{
                 padding: '15px 20px',
                 border: 'none',
-                backgroundColor: activeTab === 'passwords' ? '#007bff' : 'transparent',
+                backgroundColor: activeTab === 'passwords' ? '#8fbc8f' : 'transparent',
                 color: activeTab === 'passwords' ? 'white' : '#666',
                 cursor: 'pointer',
                 fontSize: '14px',
@@ -351,7 +351,7 @@ const AdminPanel = ({ onClose }) => {
                                 }}
                                 style={{
                                   padding: '5px 15px',
-                                  backgroundColor: '#28a745',
+                                  backgroundColor: '#8fbc8f',
                                   color: 'white',
                                   border: 'none',
                                   borderRadius: '4px',
@@ -359,9 +359,9 @@ const AdminPanel = ({ onClose }) => {
                                   fontSize: '12px'
                                 }}
                               >
-                                💾 保存 (Ctrl+Enter)
+                                保存
                               </button>
-                              <button
+                              {/* <button
                                 onClick={() => setEditingTestimonial(null)}
                                 style={{
                                   padding: '5px 15px',
@@ -373,8 +373,8 @@ const AdminPanel = ({ onClose }) => {
                                   fontSize: '12px'
                                 }}
                               >
-                                ❌ 取消 (Esc)
-                              </button>
+                                取消
+                              </button> */}
                             </div>
                           </div>
                         ) : (
@@ -382,7 +382,7 @@ const AdminPanel = ({ onClose }) => {
                             <p style={{ 
                               margin: '10px 0',
                               lineHeight: '1.5',
-                              backgroundColor: '#f8f9fa',
+                            //   backgroundColor: '#f8f9fa',
                               padding: '10px',
                               borderRadius: '4px'
                             }}>
@@ -422,7 +422,7 @@ const AdminPanel = ({ onClose }) => {
                             )}
                             style={{
                               padding: '6px 12px',
-                              backgroundColor: '#007bff',
+                              backgroundColor: '#d4b97a',
                               color: 'white',
                               border: 'none',
                               borderRadius: '4px',
@@ -430,14 +430,14 @@ const AdminPanel = ({ onClose }) => {
                               fontSize: '12px'
                             }}
                           >
-                            ✏️ {editingTestimonial === testimonial.id ? '取消編輯' : '編輯'}
+                            {editingTestimonial === testimonial.id ? '取消編輯' : '編輯'}
                           </button>
                           
                           <button
                             onClick={() => handleDeleteTestimonial(testimonial.id)}
                             style={{
                               padding: '6px 12px',
-                              backgroundColor: '#dc3545',
+                              backgroundColor: '#cd9b9b',
                               color: 'white',
                               border: 'none',
                               borderRadius: '4px',
@@ -445,7 +445,7 @@ const AdminPanel = ({ onClose }) => {
                               fontSize: '12px'
                             }}
                           >
-                            🗑️ 刪除
+                            刪除
                           </button>
                         </div>
                       </div>
@@ -505,7 +505,7 @@ const AdminPanel = ({ onClose }) => {
                         <strong>下次更新日期：</strong> {passwordStatus.nextUpdateDate}
                       </div>
                       <div style={{ 
-                        color: passwordStatus.isExpiringSoon ? '#d63384' : '#28a745',
+                        color: passwordStatus.isExpiringSoon ? '#d63384' : '#a8956f',
                         fontWeight: '500'
                       }}>
                         <strong>剩餘天數：</strong> {passwordStatus.daysUntilExpiry} 天
@@ -548,7 +548,7 @@ const AdminPanel = ({ onClose }) => {
                         disabled={!newMemberPassword.trim()}
                         style={{
                           padding: '10px 20px',
-                          backgroundColor: newMemberPassword.trim() ? '#28a745' : '#ccc',
+                          backgroundColor: newMemberPassword.trim() ? '#a8956f' : '#ccc',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
@@ -556,7 +556,7 @@ const AdminPanel = ({ onClose }) => {
                           whiteSpace: 'nowrap'
                         }}
                       >
-                        🔄 更新密碼
+                        更新密碼
                       </button>
                     </div>
                     <p style={{ 

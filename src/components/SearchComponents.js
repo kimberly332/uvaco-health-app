@@ -26,7 +26,7 @@ export const ProductSearch = ({ searchTerm, onSearchChange, onClearSearch }) => 
             outline: 'none',
             transition: 'border-color 0.3s'
           }}
-          onFocus={(e) => e.target.style.borderColor = '#007bff'}
+          onFocus={(e) => e.target.style.borderColor = '#8fbc8f'}
           onBlur={(e) => e.target.style.borderColor = '#ddd'}
         />
         
@@ -109,7 +109,7 @@ export const TestimonialFilter = ({
             outline: 'none',
             transition: 'border-color 0.3s'
           }}
-          onFocus={(e) => e.target.style.borderColor = '#007bff'}
+          onFocus={(e) => e.target.style.borderColor = '#8fbc8f'}
           onBlur={(e) => e.target.style.borderColor = '#ddd'}
         />
         
