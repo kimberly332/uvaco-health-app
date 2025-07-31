@@ -1,14 +1,37 @@
-// ProductStats.js - Clean version without styling
 import React from 'react';
 
-// Product sort component
+// 產品排序組件
 export const ProductSort = ({ sortBy, onSortChange }) => {
   return (
-    <div>
-      <label>📋 排序方式：</label>
+    <div style={{
+      backgroundColor: 'white',
+      padding: '15px',
+      borderRadius: '8px',
+      marginBottom: '15px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <label style={{
+        display: 'block',
+        marginBottom: '8px',
+        fontSize: '14px',
+        color: '#666',
+        fontWeight: 'bold'
+      }}>
+        📋 排序方式：
+      </label>
       <select
         value={sortBy}
         onChange={(e) => onSortChange(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '10px 15px',
+          border: '1px solid #ddd',
+          borderRadius: '6px',
+          fontSize: '14px',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          outline: 'none'
+        }}
       >
         <option value="default">🔸 預設排序</option>
         <option value="series">📦 按系列分組</option>
