@@ -1,3 +1,4 @@
+// src/components/SearchComponents.js - 完整修改版本
 import React from 'react';
 
 // 產品搜尋組件
@@ -75,7 +76,7 @@ export const ProductSearch = ({ searchTerm, onSearchChange, onClearSearch }) => 
   );
 };
 
-// 見證篩選組件
+// 見證篩選組件 - 完整修改版本
 export const TestimonialFilter = ({ 
   searchTerm, 
   onSearchChange, 
@@ -84,6 +85,22 @@ export const TestimonialFilter = ({
   products, 
   onClearFilters 
 }) => {
+  // 按系列分組產品的函數
+  const getProductsBySeires = (series) => {
+    return products.filter(product => product.series === series);
+  };
+
+  // 定義系列順序和顏色
+  const seriesConfig = [
+    { name: '基本保養系列', color: '🟢', value: 'series-基本保養系列' },
+    { name: '清除系列', color: '⚫', value: 'series-清除系列' },
+    { name: '調理系列', color: '🔵', value: 'series-調理系列' },
+    { name: '活力丰采系列', color: '🔴', value: 'series-活力丰采系列' },
+    { name: '寵物食品系列', color: '🟡', value: 'series-寵物食品系列' },
+    { name: '生活保養系列', color: '🟣', value: 'series-生活保養系列' },
+    { name: '全身調理系列', color: '🟤', value: 'series-全身調理系列' }
+  ];
+
   return (
     <div style={{ 
       backgroundColor: 'white',
@@ -126,7 +143,7 @@ export const TestimonialFilter = ({
         </div>
       </div>
 
-      {/* 產品篩選下拉選單 */}
+      {/* 產品篩選下拉選單 - 完全重新設計 */}
       <div style={{ marginBottom: '15px' }}>
         <label style={{ 
           display: 'block', 
@@ -152,11 +169,104 @@ export const TestimonialFilter = ({
           }}
         >
           <option value="">🌟 所有產品</option>
-          {products.map(product => (
-            <option key={product.id} value={product.id}>
-              {product.name} ({product.series})
+          
+          {/* 系列篩選選項 */}
+          {seriesConfig.map(series => (
+            <option key={series.value} value={series.value}>
+              {series.color} {series.name}
             </option>
           ))}
+          
+          {/* 分隔線 */}
+          <option disabled>──────────────────</option>
+          
+          {/* 🟢 基本保養系列 */}
+          {getProductsBySeires('基本保養系列').length > 0 && (
+            <optgroup label="🟢 基本保養系列">
+              {getProductsBySeires('基本保養系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* ⚫ 清除系列 */}
+          {getProductsBySeires('清除系列').length > 0 && (
+            <optgroup label="⚫ 清除系列">
+              {getProductsBySeires('清除系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* 🍽️ 營養餐飲系列 */}
+          {getProductsBySeires('營養餐飲系列').length > 0 && (
+            <optgroup label="🍽️ 營養餐飲系列">
+              {getProductsBySeires('營養餐飲系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* 🔵 調理系列 */}
+          {getProductsBySeires('調理系列').length > 0 && (
+            <optgroup label="🔵 調理系列">
+              {getProductsBySeires('調理系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* 🔴 活力丰采系列 */}
+          {getProductsBySeires('活力丰采系列').length > 0 && (
+            <optgroup label="🔴 活力丰采系列">
+              {getProductsBySeires('活力丰采系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* 🟣 生活保養系列 */}
+          {getProductsBySeires('生活保養系列').length > 0 && (
+            <optgroup label="🟣 生活保養系列">
+              {getProductsBySeires('生活保養系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* 🟤 全身調理系列 */}
+          {getProductsBySeires('全身調理系列').length > 0 && (
+            <optgroup label="🟤 全身調理系列">
+              {getProductsBySeires('全身調理系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          
+          {/* 🟡 寵物食品系列 */}
+          {getProductsBySeires('寵物食品系列').length > 0 && (
+            <optgroup label="🟡 寵物食品系列">
+              {getProductsBySeires('寵物食品系列').map(product => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
       </div>
 
@@ -191,7 +301,11 @@ export const TestimonialFilter = ({
                 borderRadius: '12px',
                 fontSize: '11px'
               }}>
-                產品: {products.find(p => p.id === selectedProduct)?.name}
+                產品: {
+                  selectedProduct.startsWith('series-') 
+                    ? selectedProduct.replace('series-', '') + ' (系列)'
+                    : products.find(p => p.id === selectedProduct)?.name
+                }
               </span>
             )}
           </div>

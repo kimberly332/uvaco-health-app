@@ -272,7 +272,7 @@ const AdminPanel = ({ onClose }) => {
                       <div
                         key={testimonial.id}
                         style={{
-                          border: `2px solid ${hasSensitiveContent ? '#ff6b6b' : '#e9ecef'}`,
+                          border: `1px solid ${hasSensitiveContent ? '#ff6b6b' : '#e9ecef'}`,
                           borderRadius: '8px',
                           padding: '15px',
                           backgroundColor: hasSensitiveContent ? '#fff5f5' : 'white'

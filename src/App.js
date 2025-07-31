@@ -193,28 +193,68 @@ function AppContent() {
   return filtered;
 }, [products, productSearchTerm, productSortBy, testimonials, removeDuplicateProducts, getTestimonialsForProduct]);
   // 見證搜尋和篩選邏輯
-  const filteredTestimonials = useMemo(() => {
-    let filtered = testimonials;
+  // 見證搜尋和篩選邏輯 - 修正版
+const filteredTestimonials = useMemo(() => {
+  console.log('🔍 見證篩選邏輯執行中...', {
+    原始見證數量: testimonials.length,
+    搜尋詞: testimonialSearchTerm,
+    產品篩選: selectedProductFilter
+  });
 
-    if (testimonialSearchTerm) {
-      const searchLower = testimonialSearchTerm.toLowerCase();
-      filtered = filtered.filter(testimonial =>
-        testimonial.story.toLowerCase().includes(searchLower) ||
-        testimonial.displayName.toLowerCase().includes(searchLower) ||
-        testimonial.productNames?.some(name => 
-          name.toLowerCase().includes(searchLower)
-        )
-      );
+  let filtered = testimonials;
+
+  // 搜尋過濾
+  if (testimonialSearchTerm) {
+    const searchLower = testimonialSearchTerm.toLowerCase();
+    filtered = filtered.filter(testimonial =>
+      testimonial.story.toLowerCase().includes(searchLower) ||
+      testimonial.displayName.toLowerCase().includes(searchLower) ||
+      testimonial.productNames?.some(name => 
+        name.toLowerCase().includes(searchLower)
+      )
+    );
+    console.log('搜尋篩選後見證數量:', filtered.length);
+  }
+
+  // 🔥 關鍵修正：產品篩選 - 支援系列篩選
+  if (selectedProductFilter) {
+    if (selectedProductFilter.startsWith('series-')) {
+      // 系列篩選：找出該系列的所有產品ID
+      const targetSeries = selectedProductFilter.replace('series-', '');
+      console.log('🎯 見證系列篩選:', targetSeries);
+      
+      const seriesProductIds = products
+        .filter(product => product.series === targetSeries)
+        .map(product => product.id);
+      
+      console.log('🔍 該系列產品IDs:', seriesProductIds);
+      
+      // 篩選包含該系列任一產品的見證
+      filtered = filtered.filter(testimonial => {
+        const hasSeriesProduct = testimonial.productIds?.some(productId => 
+          seriesProductIds.includes(productId)
+        );
+        if (hasSeriesProduct) {
+          console.log('✅ 符合系列的見證:', testimonial.displayName);
+        }
+        return hasSeriesProduct;
+      });
+    } else {
+      // 具體產品篩選
+      filtered = filtered.filter(testimonial => {
+        const hasProduct = testimonial.productIds?.includes(selectedProductFilter);
+        if (hasProduct) {
+          console.log('✅ 符合產品的見證:', testimonial.displayName);
+        }
+        return hasProduct;
+      });
     }
+    console.log('產品篩選後見證數量:', filtered.length);
+  }
 
-    if (selectedProductFilter) {
-      filtered = filtered.filter(testimonial =>
-        testimonial.productIds?.includes(selectedProductFilter)
-      );
-    }
-
-    return filtered;
-  }, [testimonials, testimonialSearchTerm, selectedProductFilter]);
+  console.log('最終見證數量:', filtered.length);
+  return filtered;
+}, [testimonials, testimonialSearchTerm, selectedProductFilter, products]);
 
   // 初始化產品資料
   useEffect(() => {
