@@ -70,7 +70,7 @@ const AdminPanel = ({ onClose }) => {
 
   // 加載密碼狀態（僅超級管理員）
   useEffect(() => {
-    if (isSuperAdmin()) {
+    if (isSuperAdmin) {
       loadPasswordStatus();
     }
   }, []);
@@ -230,7 +230,7 @@ const AdminPanel = ({ onClose }) => {
             📝 見證管理 ({testimonials.length})
           </button>
           
-          {isSuperAdmin() && (
+          {isSuperAdmin && (
             <button
               onClick={() => setActiveTab('passwords')}
               style={{
@@ -456,7 +456,7 @@ const AdminPanel = ({ onClose }) => {
             </div>
           )}
 
-          {activeTab === 'passwords' && isSuperAdmin() && (
+          {activeTab === 'passwords' && isSuperAdmin && (
             <div>
               <h3 style={{ marginBottom: '20px' }}>密碼管理</h3>
               

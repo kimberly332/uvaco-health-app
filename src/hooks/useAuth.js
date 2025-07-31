@@ -1,4 +1,4 @@
-// src/hooks/useAuth.js
+// src/hooks/useAuth.js - FIXED VERSION
 import { useState, useEffect, createContext, useContext } from 'react';
 import { USER_ROLES, hasPermission } from '../services/authService';
 
@@ -85,15 +85,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 檢查是否為管理員
-  const isAdmin = () => {
-    return user && (user.role === USER_ROLES.ADMIN || user.role === USER_ROLES.SUPER_ADMIN);
-  };
+  // ✅ FIXED: 檢查是否為管理員 - 返回布林值而非函數
+  const isAdmin = user && (user.role === USER_ROLES.ADMIN || user.role === USER_ROLES.SUPER_ADMIN);
 
-  // 檢查是否為超級管理員
-  const isSuperAdmin = () => {
-    return user && user.role === USER_ROLES.SUPER_ADMIN;
-  };
+  // ✅ FIXED: 檢查是否為超級管理員 - 返回布林值而非函數
+  const isSuperAdmin = user && user.role === USER_ROLES.SUPER_ADMIN;
 
   const value = {
     user,
@@ -103,8 +99,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     checkPermission,
     getRoleDisplayName,
-    isAdmin,
-    isSuperAdmin
+    isAdmin,      // ✅ Now this is a boolean value
+    isSuperAdmin  // ✅ Now this is a boolean value
   };
 
   return (
