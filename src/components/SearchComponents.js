@@ -1,4 +1,4 @@
-// src/components/SearchComponents.js - 完整修改版本
+// src/components/SearchComponents.js - 完整修復版本
 import React from 'react';
 
 // 產品搜尋組件
@@ -76,7 +76,7 @@ export const ProductSearch = ({ searchTerm, onSearchChange, onClearSearch }) => 
   );
 };
 
-// 見證篩選組件 - 完整修改版本
+// 見證篩選組件
 export const TestimonialFilter = ({ 
   searchTerm, 
   onSearchChange, 
@@ -143,7 +143,7 @@ export const TestimonialFilter = ({
         </div>
       </div>
 
-      {/* 產品篩選下拉選單 - 完全重新設計 */}
+      {/* 產品篩選下拉選單 */}
       <div style={{ marginBottom: '15px' }}>
         <label style={{ 
           display: 'block', 
@@ -180,93 +180,21 @@ export const TestimonialFilter = ({
           {/* 分隔線 */}
           <option disabled>──────────────────</option>
           
-          {/* 🟢 基本保養系列 */}
-          {getProductsBySeires('基本保養系列').length > 0 && (
-            <optgroup label="🟢 基本保養系列">
-              {getProductsBySeires('基本保養系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* ⚫ 清除系列 */}
-          {getProductsBySeires('清除系列').length > 0 && (
-            <optgroup label="⚫ 清除系列">
-              {getProductsBySeires('清除系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* 🍽️ 營養餐飲系列 */}
-          {getProductsBySeires('營養餐飲系列').length > 0 && (
-            <optgroup label="🍽️ 營養餐飲系列">
-              {getProductsBySeires('營養餐飲系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* 🔵 調理系列 */}
-          {getProductsBySeires('調理系列').length > 0 && (
-            <optgroup label="🔵 調理系列">
-              {getProductsBySeires('調理系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* 🔴 活力丰采系列 */}
-          {getProductsBySeires('活力丰采系列').length > 0 && (
-            <optgroup label="🔴 活力丰采系列">
-              {getProductsBySeires('活力丰采系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* 🟣 生活保養系列 */}
-          {getProductsBySeires('生活保養系列').length > 0 && (
-            <optgroup label="🟣 生活保養系列">
-              {getProductsBySeires('生活保養系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* 🟤 全身調理系列 */}
-          {getProductsBySeires('全身調理系列').length > 0 && (
-            <optgroup label="🟤 全身調理系列">
-              {getProductsBySeires('全身調理系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          
-          {/* 🟡 寵物食品系列 */}
-          {getProductsBySeires('寵物食品系列').length > 0 && (
-            <optgroup label="🟡 寵物食品系列">
-              {getProductsBySeires('寵物食品系列').map(product => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
+          {/* 各系列的產品 */}
+          {seriesConfig.map(series => {
+            const seriesProducts = getProductsBySeires(series.name);
+            if (seriesProducts.length === 0) return null;
+            
+            return (
+              <optgroup key={series.name} label={`${series.color} ${series.name}`}>
+                {seriesProducts.map(product => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </optgroup>
+            );
+          })}
         </select>
       </div>
 
@@ -333,14 +261,24 @@ export const TestimonialFilter = ({
   );
 };
 
-// 搜尋結果統計組件
-export const SearchResults = ({ totalCount, filteredCount, searchTerm, type = '產品' }) => {
-  // 確保數值有效
-  const safeTotal = totalCount || 0;
-  const safeFiltered = filteredCount || 0;
+// 搜尋結果統計組件 - 修復版
+export const SearchResults = ({ 
+  searchTerm, 
+  filteredCount, 
+  totalCount, 
+  type = '產品',
+  isLoading = false,
+  // 向後兼容的 props
+  query,
+  count
+}) => {
+  // 支援新舊兩種 props 格式
+  const finalSearchTerm = searchTerm || query || '';
+  const finalFilteredCount = filteredCount !== undefined ? filteredCount : count || 0;
+  const finalTotalCount = totalCount || 0;
   
-  // 如果數據還在載入中
-  if (safeTotal === 0) {
+  // 如果正在載入中
+  if (isLoading) {
     return (
       <div style={{
         padding: '10px 15px',
@@ -357,32 +295,51 @@ export const SearchResults = ({ totalCount, filteredCount, searchTerm, type = '�
     );
   }
 
+  // 如果沒有總數據但不是載入中，可能是錯誤
+  if (finalTotalCount === 0 && !isLoading && !finalSearchTerm) {
+    return (
+      <div style={{
+        padding: '10px 15px',
+        backgroundColor: '#fff3cd',
+        color: '#856404',
+        borderRadius: '6px',
+        marginBottom: '15px',
+        fontSize: '14px',
+        border: '1px solid #ffeaa7',
+        textAlign: 'center'
+      }}>
+        ❌ 無法載入{type}資料，請重新整理頁面
+      </div>
+    );
+  }
+
   return (
     <div style={{
       padding: '10px 15px',
-      backgroundColor: safeFiltered > 0 ? '#e3f2fd' : '#fff3cd',
-      color: safeFiltered > 0 ? '#1976d2' : '#856404',
+      backgroundColor: finalFilteredCount > 0 ? '#e3f2fd' : '#fff3cd',
+      color: finalFilteredCount > 0 ? '#1976d2' : '#856404',
       borderRadius: '6px',
       marginBottom: '15px',
       fontSize: '14px',
-      border: `1px solid ${safeFiltered > 0 ? '#bbdefb' : '#ffeaa7'}`,
+      border: `1px solid ${finalFilteredCount > 0 ? '#bbdefb' : '#ffeaa7'}`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between'
     }}>
       <div>
-        {searchTerm && searchTerm !== '篩選條件' ? (
+        {finalSearchTerm && finalSearchTerm !== '篩選條件' ? (
           <span>
-            🔍 搜尋 "<strong>{searchTerm}</strong>" 找到 <strong>{safeFiltered}</strong> 個{type}
+            🔍 搜尋 "<strong>{finalSearchTerm}</strong>" 找到 <strong>{finalFilteredCount}</strong> 個{type}
           </span>
         ) : (
           <span>
-            📊 總共顯示：<strong>{safeFiltered}</strong> / {safeTotal} 個{type}
+            📊 總共顯示：<strong>{finalFilteredCount}</strong>
+            {finalTotalCount > 0 && ` / ${finalTotalCount}`} 個{type}
           </span>
         )}
       </div>
       
-      {safeFiltered === 0 && searchTerm && (
+      {finalFilteredCount === 0 && finalSearchTerm && (
         <div style={{ fontSize: '20px' }}>😅</div>
       )}
     </div>

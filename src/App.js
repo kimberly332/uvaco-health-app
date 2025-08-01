@@ -1,4 +1,4 @@
-// src/App.js - 完整版本，整合見證分享功能
+// src/App.js - 完整修復版本
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useProducts, useTestimonials } from './hooks/useFirestore';
 import { INITIAL_PRODUCTS } from './utils/constants';
@@ -7,7 +7,7 @@ import TestimonialCard from './components/TestimonialCard';
 import ProductDetail from './components/ProductDetail';
 import TestimonialForm from './components/TestimonialForm';
 import { ProductSearch, TestimonialFilter, SearchResults } from './components/SearchComponents';
-import { ProductSort } from './components/ProductStats';
+import { ProductFilter } from './components/ProductStats'; // 只導入 ProductFilter
 import LoginComponent from './components/LoginComponent';
 import AdminPanel from './components/AdminPanel';
 import { AuthProvider, useAuth, ProtectedComponent, RoleProtectedComponent } from './hooks/useAuth';
@@ -21,7 +21,7 @@ function AppContent() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   
-  // 新增：見證分享功能狀態
+  // 見證分享功能狀態
   const [sharedTestimonialId, setSharedTestimonialId] = useState(null);
   const [showSharedTestimonial, setShowSharedTestimonial] = useState(false);
   
@@ -29,7 +29,7 @@ function AppContent() {
   const [productSearchTerm, setProductSearchTerm] = useState('');
   const [testimonialSearchTerm, setTestimonialSearchTerm] = useState('');
   const [selectedProductFilter, setSelectedProductFilter] = useState('');
-  const [productSortBy, setProductSortBy] = useState('default');
+  const [selectedSeries, setSelectedSeries] = useState(''); // 新增：系列篩選狀態
   
   // 初始化狀態控制
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -37,7 +37,7 @@ function AppContent() {
   const { documents: products, loading: productsLoading, addDocument: addProduct } = useProducts();
   const { documents: testimonials, loading: testimonialsLoading, addDocument: addTestimonial } = useTestimonials();
 
-  // 新增：檢測URL參數中的見證分享
+  // 檢測URL參數中的見證分享
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const testimonialId = urlParams.get('testimonial');
@@ -48,7 +48,7 @@ function AppContent() {
     }
   }, []);
 
-  // ✅ 1. 首先定義工具函數
+  // 工具函數
   const removeDuplicateProducts = useCallback((products) => {
     const uniqueProducts = [];
     const seenIds = new Set();
@@ -63,14 +63,14 @@ function AppContent() {
     return uniqueProducts;
   }, []);
 
-  // ✅ 2. 然後定義 getTestimonialsForProduct（在 filteredAndSortedProducts 之前）
+  // 獲取產品的見證數量
   const getTestimonialsForProduct = useCallback((productId) => {
     return testimonials.filter(testimonial => 
       testimonial.productIds?.includes(productId)
     );
   }, [testimonials]);
 
-  // ✅ 3. 產品篩選和排序邏輯
+  // 產品篩選邏輯 - 移除排序功能
   const filteredAndSortedProducts = useMemo(() => {
     if (!products) return [];
     
@@ -86,30 +86,15 @@ function AppContent() {
       );
     }
     
-    // 產品排序
-    switch (productSortBy) {
-      case 'name':
-        return [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-      case 'series':
-        return [...filtered].sort((a, b) => (a.series || '').localeCompare(b.series || ''));
-      case 'testimonials':
-        return [...filtered].sort((a, b) => {
-          const aCount = getTestimonialsForProduct(a.id).length;
-          const bCount = getTestimonialsForProduct(b.id).length;
-          return bCount - aCount; // 降序排列
-        });
-      case 'price':
-        return [...filtered].sort((a, b) => {
-          const aPrice = parseFloat((a.price || '0').replace(/[^\d.]/g, ''));
-          const bPrice = parseFloat((b.price || '0').replace(/[^\d.]/g, ''));
-          return aPrice - bPrice;
-        });
-      default:
-        return filtered;
+    // 系列篩選
+    if (selectedSeries) {
+      filtered = filtered.filter(product => product.series === selectedSeries);
     }
-  }, [products, productSearchTerm, productSortBy, removeDuplicateProducts, getTestimonialsForProduct]);
+    
+    return filtered; // 只返回篩選結果，不做排序
+  }, [products, productSearchTerm, selectedSeries, removeDuplicateProducts]);
 
-  // ✅ 4. 見證篩選邏輯
+  // 見證篩選邏輯
   const filteredTestimonials = useMemo(() => {
     if (!testimonials) return [];
     
@@ -171,10 +156,10 @@ function AppContent() {
     setProductSearchTerm('');
     setTestimonialSearchTerm('');
     setSelectedProductFilter('');
-    setProductSortBy('default');
+    setSelectedSeries(''); // 清除系列篩選
   };
 
-  // 新增：關閉分享見證頁面
+  // 關閉分享見證頁面
   const closeSharedTestimonial = () => {
     setShowSharedTestimonial(false);
     setSharedTestimonialId(null);
@@ -224,7 +209,10 @@ function AppContent() {
     }
   };
 
-  // 新增：如果有分享的見證且未登入，顯示特殊的見證查看界面
+  // 載入狀態
+  const isProductsLoading = productsLoading || !products;
+
+  // 如果有分享的見證且未登入，顯示特殊的見證查看界面
   if (showSharedTestimonial && !isAuthenticated) {
     const sharedTestimonial = testimonials.find(t => t.id === sharedTestimonialId);
     
@@ -466,8 +454,10 @@ function AppContent() {
       </header>
 
       <main className="app-main">
+        {/* 產品頁面 - 修復版 */}
         {currentView === 'products' && (
           <div>
+            {/* 搜尋和篩選區域 */}
             <div style={{ marginBottom: '20px' }}>
               <ProductSearch 
                 searchTerm={productSearchTerm}
@@ -475,36 +465,67 @@ function AppContent() {
                 onClearSearch={() => setProductSearchTerm('')}
               />
               
-              <ProductSort 
-                sortBy={productSortBy}
-                onSortChange={setProductSortBy}
-                products={filteredAndSortedProducts}
-                testimonials={testimonials}
+              <ProductFilter 
+                selectedSeries={selectedSeries}
+                onSeriesChange={setSelectedSeries}
+                products={removeDuplicateProducts(products || [])}
               />
+              
+
             </div>
 
-            {(productSearchTerm || productSortBy !== 'default') && (
+            {/* 結果統計 */}
+            {(productSearchTerm || selectedSeries) && (
               <SearchResults 
-                query={productSearchTerm}
-                count={filteredAndSortedProducts.length}
+                searchTerm={productSearchTerm}
+                filteredCount={filteredAndSortedProducts.length}
+                totalCount={removeDuplicateProducts(products || []).length}
                 type="產品"
-                onClear={clearFilters}
+                isLoading={isProductsLoading}
               />
             )}
 
-            <div className="products-grid">
-              {filteredAndSortedProducts.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product}
-                  onViewDetails={handleViewDetails}
-                  testimonialCount={getTestimonialsForProduct(product.id).length}
-                />
-              ))}
-            </div>
+            {/* 產品網格 */}
+            {isProductsLoading ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div style={{ fontSize: '48px', marginBottom: '10px' }}>⏳</div>
+                <p>載入產品中...</p>
+              </div>
+            ) : filteredAndSortedProducts.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div style={{ fontSize: '48px', marginBottom: '10px' }}>😕</div>
+                <p>找不到符合條件的產品</p>
+                <button
+                  onClick={clearFilters}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    marginTop: '10px'
+                  }}
+                >
+                  清除所有篩選條件
+                </button>
+              </div>
+            ) : (
+              <div className="products-grid">
+                {filteredAndSortedProducts.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product}
+                    onViewDetails={handleViewDetails}
+                    testimonialCount={getTestimonialsForProduct(product.id).length}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
+        {/* 見證頁面 */}
         {currentView === 'testimonials' && (
           <ProtectedComponent permission="view_testimonials">
             <div>
@@ -520,9 +541,9 @@ function AppContent() {
               </div>
 
               <SearchResults 
-                query={testimonialSearchTerm ? 
-                  (testimonialSearchTerm + ' ' + (selectedProductFilter ? '篩選條件' : '')).trim() : ''}
-                count={filteredTestimonials.length}
+                searchTerm={testimonialSearchTerm}
+                filteredCount={filteredTestimonials.length}
+                totalCount={testimonials?.length || 0}
                 type="心得分享"
               />
 
@@ -551,6 +572,7 @@ function AppContent() {
           </ProtectedComponent>
         )}
 
+        {/* 產品詳細頁面 */}
         {currentView === 'product-detail' && selectedProduct && (
           <ProductDetail 
             product={selectedProduct}
@@ -560,6 +582,7 @@ function AppContent() {
           />
         )}
 
+        {/* 新增見證頁面 */}
         {currentView === 'add-testimonial' && (
           <ProtectedComponent permission="submit_testimonial">
             <TestimonialForm
@@ -578,6 +601,7 @@ function AppContent() {
         )}
       </main>
       
+      {/* 底部導航 */}
       <nav className="app-nav">
         <button 
           onClick={() => setCurrentView('products')}

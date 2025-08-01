@@ -1,7 +1,7 @@
-// src/components/ProductStats.js - 完整修改版本
+// src/components/ProductStats.js - 完整修復版本
 import React from 'react';
 
-// 產品排序組件 - 已經符合您的需求，只需微調
+// 產品排序組件 - 只處理純粹的排序功能
 export const ProductSort = ({ sortBy, onSortChange }) => {
   return (
     <div style={{
@@ -35,34 +35,77 @@ export const ProductSort = ({ sortBy, onSortChange }) => {
         }}
       >
         <option value="default">🔸 預設排序</option>
+        <option value="name">🔤 按名稱排序</option>
         <option value="series">📦 按系列分組</option>
-        
-        {/* 分隔線 */}
-        <option disabled>──────────────────</option>
-        
-        {/* 系列篩選選項（保持您原有的格式）*/}
-        <option value="series-基本保養系列">🟢 基本保養系列</option>
-        <option value="series-清除系列">⚫ 清除系列</option>
-        <option value="series-調理系列">🔵 調理系列</option>
-        <option value="series-活力丰采系列">🔴 活力丰采系列</option>
-        <option value="series-寵物食品系列">🟡 寵物食品系列</option>
-        <option value="series-生活保養系列">🟣 生活保養系列</option>
-        <option value="series-全身調理系列">🟤 全身調理系列</option>
-        
-        {/* 分隔線 */}
-        <option disabled>──────────────────</option>
-        
-        {/* 其他排序選項 */}
-        <option value="testimonials-desc">💬 見證數量（多到少）</option>
-        <option value="testimonials-asc">🤍 見證數量（少到多）</option>
-        <option value="price-desc">💰 價格（高到低）</option>
-        <option value="price-asc">💸 價格（低到高）</option>
+        <option value="price">💰 按價格排序</option>
+        <option value="testimonials">💬 按見證數排序</option>
       </select>
     </div>
   );
 };
 
-// 產品統計組件（可選）
+// 新增：產品系列篩選組件
+export const ProductFilter = ({ selectedSeries, onSeriesChange, products }) => {
+  // 獲取所有可用的系列
+  const availableSeries = [...new Set(products.map(p => p.series).filter(Boolean))].sort();
+  
+  // 系列圖標映射
+  const getSeriesIcon = (series) => {
+    const icons = {
+      '基本保養系列': '🟢',
+      '清除系列': '⚫',
+      '調理系列': '🔵',
+      '活力丰采系列': '🔴',
+      '寵物食品系列': '🟡',
+      '生活保養系列': '🟣',
+      '全身調理系列': '🟤'
+    };
+    return icons[series] || '📦';
+  };
+
+  return (
+    <div style={{
+      backgroundColor: 'white',
+      padding: '15px',
+      borderRadius: '8px',
+      marginBottom: '15px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <label style={{
+        display: 'block',
+        marginBottom: '8px',
+        fontSize: '14px',
+        color: '#666',
+        fontWeight: 'bold'
+      }}>
+        📦 按系列篩選：
+      </label>
+      <select
+        value={selectedSeries}
+        onChange={(e) => onSeriesChange(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '10px 15px',
+          border: '1px solid #ddd',
+          borderRadius: '6px',
+          fontSize: '14px',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          outline: 'none'
+        }}
+      >
+        <option value="">🌟 所有系列</option>
+        {availableSeries.map(series => (
+          <option key={series} value={series}>
+            {getSeriesIcon(series)} {series}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+// 產品統計組件（可選，用於顯示統計資訊）
 export const ProductStats = ({ products, testimonials }) => {
   // 計算各系列的產品數量
   const seriesStats = products.reduce((acc, product) => {
@@ -112,12 +155,19 @@ export const ProductStats = ({ products, testimonials }) => {
           borderRadius: '8px',
           border: '1px solid #dee2e6'
         }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#007bff' }}>
+          <div style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#007bff',
+            marginBottom: '5px'
+          }}>
             {products.length}
           </div>
-          <div style={{ fontSize: '14px', color: '#666' }}>總產品數</div>
+          <div style={{ fontSize: '14px', color: '#666' }}>
+            總產品數
+          </div>
         </div>
-        
+
         <div style={{
           textAlign: 'center',
           padding: '15px',
@@ -125,25 +175,19 @@ export const ProductStats = ({ products, testimonials }) => {
           borderRadius: '8px',
           border: '1px solid #dee2e6'
         }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
+          <div style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#28a745',
+            marginBottom: '5px'
+          }}>
             {Object.keys(seriesStats).length}
           </div>
-          <div style={{ fontSize: '14px', color: '#666' }}>產品系列</div>
-        </div>
-        
-        <div style={{
-          textAlign: 'center',
-          padding: '15px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6'
-        }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107' }}>
-            {totalTestimonials}
+          <div style={{ fontSize: '14px', color: '#666' }}>
+            產品系列
           </div>
-          <div style={{ fontSize: '14px', color: '#666' }}>見證總數</div>
         </div>
-        
+
         <div style={{
           textAlign: 'center',
           padding: '15px',
@@ -151,65 +195,79 @@ export const ProductStats = ({ products, testimonials }) => {
           borderRadius: '8px',
           border: '1px solid #dee2e6'
         }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#dc3545' }}>
+          <div style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#ffc107',
+            marginBottom: '5px'
+          }}>
             {productsWithTestimonials}
           </div>
-          <div style={{ fontSize: '14px', color: '#666' }}>有見證產品</div>
+          <div style={{ fontSize: '14px', color: '#666' }}>
+            有見證產品
+          </div>
+        </div>
+
+        <div style={{
+          textAlign: 'center',
+          padding: '15px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6'
+        }}>
+          <div style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#dc3545',
+            marginBottom: '5px'
+          }}>
+            {totalTestimonials}
+          </div>
+          <div style={{ fontSize: '14px', color: '#666' }}>
+            總見證數
+          </div>
         </div>
       </div>
-      
-      {/* 系列分佈 */}
+
+      {/* 系列分布 */}
       <div>
-        <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#555' }}>
-          📋 各系列產品分佈：
+        <h4 style={{
+          margin: '15px 0 10px 0',
+          fontSize: '16px',
+          color: '#333'
+        }}>
+          各系列產品分布：
         </h4>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '10px'
         }}>
-          {Object.entries(seriesStats).map(([series, count]) => {
-            // 定義系列對應的顏色
-            const seriesColors = {
-              '基本保養系列': '🟢',
-              '清除系列': '⚫',
-              '調理系列': '🔵',
-              '活力丰采系列': '🔴',
-              '寵物食品系列': '🟡',
-              '生活保養系列': '🟣',
-              '全身調理系列': '🟤',
-              '營養餐飲系列': '🍽️'
-            };
-            
-            const colorIcon = seriesColors[series] || '📦';
-            
-            return (
-              <div key={series} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '8px 12px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '6px',
-                border: '1px solid #e9ecef'
+          {Object.entries(seriesStats).map(([series, count]) => (
+            <div key={series} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '8px 12px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              border: '1px solid #dee2e6'
+            }}>
+              <span style={{ fontSize: '14px', color: '#333' }}>
+                {series}
+              </span>
+              <span style={{
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#007bff',
+                backgroundColor: 'white',
+                padding: '2px 6px',
+                borderRadius: '12px'
               }}>
-                <span style={{ fontSize: '14px' }}>
-                  {colorIcon} {series}
-                </span>
-                <span style={{
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  color: '#007bff',
-                  backgroundColor: 'white',
-                  padding: '2px 8px',
-                  borderRadius: '12px',
-                  border: '1px solid #dee2e6'
-                }}>
-                  {count}
-                </span>
-              </div>
-            );
-          })}
+                {count}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
