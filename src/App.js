@@ -1,4 +1,4 @@
-// src/App.js - 完整版本，包含見證排序功能
+// src/App.js - 完整版本，在原有基礎上新增見證排序功能
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useProducts, useTestimonials } from './hooks/useFirestore';
 import { INITIAL_PRODUCTS } from './utils/constants';
@@ -71,7 +71,7 @@ function AppContent() {
     );
   }, [testimonials]);
 
-  // 產品篩選和排序邏輯 - 包含新的見證排序功能
+  // 產品篩選和排序邏輯 - 新增見證排序功能
   const filteredAndSortedProducts = useMemo(() => {
     if (!products) return [];
     
@@ -110,7 +110,7 @@ function AppContent() {
     return filtered;
   }, [products, productSearchTerm, selectedSeries, testimonialSortBy, removeDuplicateProducts, getTestimonialsForProduct]);
 
-  // 見證篩選邏輯
+  // 見證篩選邏輯 - 保持原有功能
   const filteredTestimonials = useMemo(() => {
     if (!testimonials) return [];
     
@@ -167,7 +167,7 @@ function AppContent() {
     setCurrentView('add-testimonial');
   };
 
-  // 清除篩選條件 - 包含新的見證排序清除
+  // 清除篩選條件 - 新增清除見證排序
   const clearFilters = () => {
     setProductSearchTerm('');
     setTestimonialSearchTerm('');
@@ -231,56 +231,58 @@ function AppContent() {
 
   return (
     <div className="app">
-      {/* 頭部 */}
       <header className="app-header">
         <div className="header-content">
-          <img 
-            src="/api/placeholder/150/50" 
-            alt="Logo" 
-            className="logo"
-          />
-          <h1>葡萄王健康生活館</h1>
-        </div>
-        
-        {/* 管理員功能按鈕 */}
-        {isAdmin && (
-          <div style={{ 
-            position: 'absolute', 
-            top: '10px', 
-            right: '10px',
-            display: 'flex',
-            gap: '10px'
-          }}>
-            <button
-              onClick={() => setShowAdminPanel(true)}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '12px',
-                cursor: 'pointer'
-              }}
-            >
-              管理員控制台
-            </button>
+          <img src="/logo.svg" alt="UVACO 標誌" className="logo" />
+          <h1>UVACO</h1>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ 
+              fontSize: '14px', 
+              color: '#666',
+              padding: '5px 10px',
+              backgroundColor: '#f0f0f0',
+              borderRadius: '15px'
+            }}>
+              👤 {getRoleDisplayName()}
+            </span>
+            
+            {isAdmin && (
+              <button
+                onClick={() => setShowAdminPanel(true)}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#9bb8c4',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+                title="管理員控制台"
+              >
+                管理
+              </button>
+            )}
+            
             <button
               onClick={logout}
               style={{
-                padding: '6px 12px',
-                backgroundColor: '#dc3545',
+                padding: '8px 12px',
+                backgroundColor: '#9ca3af',
                 color: 'white',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 fontSize: '12px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.3s'
               }}
+              title="登出"
             >
-              登出 ({getRoleDisplayName()})
+              登出
             </button>
           </div>
-        )}
+        </div>
       </header>
 
       {/* 主要內容 */}
@@ -290,32 +292,37 @@ function AppContent() {
           <div>
             <h2>產品介紹</h2>
             
-            {/* 產品搜尋 */}
-            <ProductSearch 
-              searchTerm={productSearchTerm}
-              onSearchChange={setProductSearchTerm}
-              onClearSearch={() => setProductSearchTerm('')}
-            />
-            
-            {/* 更新後的產品篩選器 - 包含見證排序功能 */}
-            <ProductFilter 
-              selectedSeries={selectedSeries}
-              onSeriesChange={setSelectedSeries}
-              products={removeDuplicateProducts(products)}
-              testimonialSortBy={testimonialSortBy}
-              onTestimonialSortChange={setTestimonialSortBy}
-              getTestimonialsForProduct={getTestimonialsForProduct}
-            />
+            {/* 搜尋和篩選區域 */}
+            <div style={{ marginBottom: '20px' }}>
+              <ProductSearch 
+                searchTerm={productSearchTerm}
+                onSearchChange={setProductSearchTerm}
+                onClearSearch={() => setProductSearchTerm('')}
+              />
+              
+              {/* 更新後的產品篩選器 - 包含見證排序功能 */}
+              <ProductFilter 
+                selectedSeries={selectedSeries}
+                onSeriesChange={setSelectedSeries}
+                products={removeDuplicateProducts(products || [])}
+                testimonialSortBy={testimonialSortBy}
+                onTestimonialSortChange={setTestimonialSortBy}
+                getTestimonialsForProduct={getTestimonialsForProduct}
+              />
+            </div>
 
-            {/* 搜尋結果統計 */}
-            <SearchResults 
-              searchTerm={productSearchTerm}
-              filteredCount={filteredAndSortedProducts.length}
-              totalCount={products?.length || 0}
-              type="產品"
-            />
+            {/* 結果統計 */}
+            {(productSearchTerm || selectedSeries || testimonialSortBy) && (
+              <SearchResults 
+                searchTerm={productSearchTerm}
+                filteredCount={filteredAndSortedProducts.length}
+                totalCount={removeDuplicateProducts(products || []).length}
+                type="產品"
+                isLoading={productsLoading}
+              />
+            )}
 
-            {/* 產品網格顯示 */}
+            {/* 產品網格 */}
             {productsLoading ? (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <div style={{ fontSize: '48px', marginBottom: '10px' }}>⏳</div>
@@ -355,13 +362,12 @@ function AppContent() {
           </div>
         )}
 
-        {/* 見證頁面 */}
+        {/* 見證頁面 - 保持原有功能 */}
         {currentView === 'testimonials' && (
           <ProtectedComponent permission="view_testimonials">
             <div>
               <h2>心得分享</h2>
               
-              {/* 見證篩選器 */}
               <div style={{ marginBottom: '20px' }}>
                 <TestimonialFilter 
                   searchTerm={testimonialSearchTerm}
@@ -373,7 +379,6 @@ function AppContent() {
                 />
               </div>
 
-              {/* 搜尋結果統計 */}
               <SearchResults 
                 searchTerm={testimonialSearchTerm}
                 filteredCount={filteredTestimonials.length}
@@ -381,7 +386,6 @@ function AppContent() {
                 type="心得分享"
               />
 
-              {/* 見證列表顯示 */}
               {filteredTestimonials.length > 0 ? (
                 <div>
                   {filteredTestimonials.map(testimonial => (
@@ -407,7 +411,7 @@ function AppContent() {
           </ProtectedComponent>
         )}
 
-        {/* 產品詳細頁面 */}
+        {/* 產品詳細頁面 - 保持原有功能 */}
         {currentView === 'product-detail' && selectedProduct && (
           <ProductDetail 
             product={selectedProduct}
@@ -417,7 +421,7 @@ function AppContent() {
           />
         )}
 
-        {/* 新增見證頁面 */}
+        {/* 新增見證頁面 - 保持原有功能 */}
         {currentView === 'add-testimonial' && (
           <ProtectedComponent permission="submit_testimonial">
             <TestimonialForm
@@ -436,7 +440,7 @@ function AppContent() {
         )}
       </main>
       
-      {/* 底部導航 */}
+      {/* 底部導航 - 保持原有設計 */}
       <nav className="app-nav">
         <button 
           onClick={() => setCurrentView('products')}
@@ -454,7 +458,7 @@ function AppContent() {
         </ProtectedComponent>
       </nav>
 
-      {/* 管理員控制台模態框 */}
+      {/* 管理員控制台模態框 - 保持原有功能 */}
       {showAdminPanel && (
         <AdminPanel onClose={() => setShowAdminPanel(false)} />
       )}
