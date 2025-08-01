@@ -1,4 +1,4 @@
-// src/App.js - 完整修正版本
+// src/App.js - 完整版本，整合見證分享功能
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useProducts, useTestimonials } from './hooks/useFirestore';
 import { INITIAL_PRODUCTS } from './utils/constants';
@@ -21,6 +21,10 @@ function AppContent() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   
+  // 新增：見證分享功能狀態
+  const [sharedTestimonialId, setSharedTestimonialId] = useState(null);
+  const [showSharedTestimonial, setShowSharedTestimonial] = useState(false);
+  
   // 搜尋和篩選狀態
   const [productSearchTerm, setProductSearchTerm] = useState('');
   const [testimonialSearchTerm, setTestimonialSearchTerm] = useState('');
@@ -32,6 +36,17 @@ function AppContent() {
 
   const { documents: products, loading: productsLoading, addDocument: addProduct } = useProducts();
   const { documents: testimonials, loading: testimonialsLoading, addDocument: addTestimonial } = useTestimonials();
+
+  // 新增：檢測URL參數中的見證分享
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const testimonialId = urlParams.get('testimonial');
+    
+    if (testimonialId) {
+      setSharedTestimonialId(testimonialId);
+      setShowSharedTestimonial(true);
+    }
+  }, []);
 
   // ✅ 1. 首先定義工具函數
   const removeDuplicateProducts = useCallback((products) => {
@@ -55,25 +70,90 @@ function AppContent() {
     );
   }, [testimonials]);
 
-  // ✅ 3. 事件處理函數
-  const handleClearProductSearch = () => {
-    console.log('清除產品搜尋');
-    setProductSearchTerm('');
-  };
+  // ✅ 3. 產品篩選和排序邏輯
+  const filteredAndSortedProducts = useMemo(() => {
+    if (!products) return [];
+    
+    let filtered = removeDuplicateProducts(products);
+    
+    // 產品搜尋篩選
+    if (productSearchTerm) {
+      const searchLower = productSearchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name?.toLowerCase().includes(searchLower) ||
+        product.series?.toLowerCase().includes(searchLower) ||
+        product.description?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // 產品排序
+    switch (productSortBy) {
+      case 'name':
+        return [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      case 'series':
+        return [...filtered].sort((a, b) => (a.series || '').localeCompare(b.series || ''));
+      case 'testimonials':
+        return [...filtered].sort((a, b) => {
+          const aCount = getTestimonialsForProduct(a.id).length;
+          const bCount = getTestimonialsForProduct(b.id).length;
+          return bCount - aCount; // 降序排列
+        });
+      case 'price':
+        return [...filtered].sort((a, b) => {
+          const aPrice = parseFloat((a.price || '0').replace(/[^\d.]/g, ''));
+          const bPrice = parseFloat((b.price || '0').replace(/[^\d.]/g, ''));
+          return aPrice - bPrice;
+        });
+      default:
+        return filtered;
+    }
+  }, [products, productSearchTerm, productSortBy, removeDuplicateProducts, getTestimonialsForProduct]);
 
-  const handleClearTestimonialFilters = () => {
-    setTestimonialSearchTerm('');
-    setSelectedProductFilter('');
-  };
+  // ✅ 4. 見證篩選邏輯
+  const filteredTestimonials = useMemo(() => {
+    if (!testimonials) return [];
+    
+    let filtered = [...testimonials];
+    
+    // 文字搜尋
+    if (testimonialSearchTerm) {
+      const searchLower = testimonialSearchTerm.toLowerCase();
+      filtered = filtered.filter(testimonial =>
+        testimonial.story?.toLowerCase().includes(searchLower) ||
+        testimonial.userName?.toLowerCase().includes(searchLower) ||
+        testimonial.displayName?.toLowerCase().includes(searchLower) ||
+        testimonial.productNames?.some(name => 
+          name?.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+    
+    // 產品篩選
+    if (selectedProductFilter) {
+      if (selectedProductFilter.startsWith('series-')) {
+        const targetSeries = selectedProductFilter.replace('series-', '');
+        filtered = filtered.filter(testimonial =>
+          testimonial.productIds?.some(productId => {
+            const product = products.find(p => p.id === productId);
+            return product?.series === targetSeries;
+          })
+        );
+      } else {
+        filtered = filtered.filter(testimonial =>
+          testimonial.productIds?.includes(selectedProductFilter)
+        );
+      }
+    }
+    
+    return filtered.sort((a, b) => 
+      new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    );
+  }, [testimonials, testimonialSearchTerm, selectedProductFilter, products]);
 
+  // 事件處理函數
   const handleViewDetails = (product) => {
     setSelectedProduct(product);
     setCurrentView('product-detail');
-  };
-
-  const handleAddTestimonial = (product = null) => {
-    setSelectedProduct(product);
-    setCurrentView('add-testimonial');
   };
 
   const handleBackToProducts = () => {
@@ -81,187 +161,31 @@ function AppContent() {
     setCurrentView('products');
   };
 
-  const handleBackToTestimonials = () => {
-    setSelectedProduct(null);
-    setCurrentView('testimonials');
+  const handleAddTestimonial = (product = null) => {
+    setSelectedProduct(product);
+    setCurrentView('add-testimonial');
   };
 
-  // ✅ 4. 產品搜尋和排序邏輯（修正版）
-  const filteredAndSortedProducts = useMemo(() => {
-  console.log('🔍 篩選邏輯執行中...', {
-    原始產品數量: products.length,
-    搜尋詞: productSearchTerm,
-    排序方式: productSortBy
-  });
+  // 清除篩選條件
+  const clearFilters = () => {
+    setProductSearchTerm('');
+    setTestimonialSearchTerm('');
+    setSelectedProductFilter('');
+    setProductSortBy('default');
+  };
 
-  let filtered = removeDuplicateProducts(products);
-  console.log('去重後產品數量:', filtered.length);
-  
-  // 搜尋過濾
-  if (productSearchTerm && productSearchTerm.trim()) {
-    const searchLower = productSearchTerm.toLowerCase().trim();
-    console.log('開始篩選，搜尋詞:', searchLower);
-    
-    filtered = filtered.filter(product => {
-      const nameMatch = product.name && 
-        product.name.toLowerCase().includes(searchLower);
-      
-      const seriesMatch = product.series && 
-        product.series.toLowerCase().includes(searchLower);
-      
-      const conditionsMatch = product.conditions && 
-        Array.isArray(product.conditions) &&
-        product.conditions.some(condition => 
-          condition && condition.toLowerCase().includes(searchLower)
-        );
-      
-      const isMatch = nameMatch || seriesMatch || conditionsMatch;
-      
-      if (isMatch) {
-        console.log('✅ 符合條件的產品:', product.name);
-      }
-      
-      return isMatch;
-    });
-    
-    console.log('篩選後產品數量:', filtered.length);
-  }
-
-  // ✅ 修正的排序和系列篩選邏輯
-  if (productSortBy.startsWith('series-')) {
-    // 處理特定系列篩選
-    const targetSeries = productSortBy.replace('series-', '');
-    console.log('🎯 篩選特定系列:', targetSeries);
-    
-    filtered = filtered.filter(product => {
-      const matches = product.series === targetSeries;
-      if (matches) {
-        console.log('✅ 符合系列的產品:', product.name, '系列:', product.series);
-      }
-      return matches;
-    });
-    
-    console.log('系列篩選後產品數量:', filtered.length);
-    
-    // 系列內按名稱排序
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
-    
-  } else {
-    // 其他排序方式
-    filtered.sort((a, b) => {
-      switch (productSortBy) {
-        case 'default':
-          return 0; // 保持原順序
-          
-        case 'series':
-          // 按系列分組，同系列內按名稱排序
-          const seriesCompare = a.series.localeCompare(b.series);
-          return seriesCompare !== 0 ? seriesCompare : a.name.localeCompare(b.name);
-          
-        case 'name':
-          return a.name.localeCompare(b.name);
-          
-        case 'price-asc':
-          const priceA = parseInt(a.price.replace(/[^\d]/g, ''));
-          const priceB = parseInt(b.price.replace(/[^\d]/g, ''));
-          return priceA - priceB;
-          
-        case 'price-desc':
-          const priceA2 = parseInt(a.price.replace(/[^\d]/g, ''));
-          const priceB2 = parseInt(b.price.replace(/[^\d]/g, ''));
-          return priceB2 - priceA2;
-          
-        case 'testimonials-desc':
-          const countA = getTestimonialsForProduct(a.id).length;
-          const countB = getTestimonialsForProduct(b.id).length;
-          return countB - countA;
-          
-        case 'testimonials-asc':
-          const countA2 = getTestimonialsForProduct(a.id).length;
-          const countB2 = getTestimonialsForProduct(b.id).length;
-          return countA2 - countB2;
-          
-        default:
-          return 0;
-      }
-    });
-  }
-
-  console.log('最終結果產品數量:', filtered.length);
-  console.log('最終產品列表:', filtered.map(p => `${p.name} (${p.series})`));
-  
-  return filtered;
-}, [products, productSearchTerm, productSortBy, testimonials, removeDuplicateProducts, getTestimonialsForProduct]);
-  // 見證搜尋和篩選邏輯
-  // 見證搜尋和篩選邏輯 - 修正版
-const filteredTestimonials = useMemo(() => {
-  console.log('🔍 見證篩選邏輯執行中...', {
-    原始見證數量: testimonials.length,
-    搜尋詞: testimonialSearchTerm,
-    產品篩選: selectedProductFilter
-  });
-
-  let filtered = testimonials;
-
-  // 搜尋過濾
-  if (testimonialSearchTerm) {
-    const searchLower = testimonialSearchTerm.toLowerCase();
-    filtered = filtered.filter(testimonial =>
-      testimonial.story.toLowerCase().includes(searchLower) ||
-      testimonial.displayName.toLowerCase().includes(searchLower) ||
-      testimonial.productNames?.some(name => 
-        name.toLowerCase().includes(searchLower)
-      )
-    );
-    console.log('搜尋篩選後見證數量:', filtered.length);
-  }
-
-  // 🔥 關鍵修正：產品篩選 - 支援系列篩選
-  if (selectedProductFilter) {
-    if (selectedProductFilter.startsWith('series-')) {
-      // 系列篩選：找出該系列的所有產品ID
-      const targetSeries = selectedProductFilter.replace('series-', '');
-      console.log('🎯 見證系列篩選:', targetSeries);
-      
-      const seriesProductIds = products
-        .filter(product => product.series === targetSeries)
-        .map(product => product.id);
-      
-      console.log('🔍 該系列產品IDs:', seriesProductIds);
-      
-      // 篩選包含該系列任一產品的見證
-      filtered = filtered.filter(testimonial => {
-        const hasSeriesProduct = testimonial.productIds?.some(productId => 
-          seriesProductIds.includes(productId)
-        );
-        if (hasSeriesProduct) {
-          console.log('✅ 符合系列的見證:', testimonial.displayName);
-        }
-        return hasSeriesProduct;
-      });
-    } else {
-      // 具體產品篩選
-      filtered = filtered.filter(testimonial => {
-        const hasProduct = testimonial.productIds?.includes(selectedProductFilter);
-        if (hasProduct) {
-          console.log('✅ 符合產品的見證:', testimonial.displayName);
-        }
-        return hasProduct;
-      });
-    }
-    console.log('產品篩選後見證數量:', filtered.length);
-  }
-
-  console.log('最終見證數量:', filtered.length);
-  return filtered;
-}, [testimonials, testimonialSearchTerm, selectedProductFilter, products]);
+  // 新增：關閉分享見證頁面
+  const closeSharedTestimonial = () => {
+    setShowSharedTestimonial(false);
+    setSharedTestimonialId(null);
+    // 清除URL參數
+    window.history.replaceState({}, document.title, window.location.pathname);
+  };
 
   // 初始化產品資料
   useEffect(() => {
     const initializeProducts = async () => {
-      if (!productsLoading && !hasInitialized && isAuthenticated) {
-        console.log('檢查產品資料初始化狀態...');
-        
+      if (!productsLoading && products && !hasInitialized && isAuthenticated) {
         const uniqueExistingProducts = removeDuplicateProducts(products);
         
         if (uniqueExistingProducts.length === 0) {
@@ -300,9 +224,189 @@ const filteredTestimonials = useMemo(() => {
     }
   };
 
+  // 新增：如果有分享的見證且未登入，顯示特殊的見證查看界面
+  if (showSharedTestimonial && !isAuthenticated) {
+    const sharedTestimonial = testimonials.find(t => t.id === sharedTestimonialId);
+    
+    return (
+      <div className="app">
+        <header className="app-header">
+          <div className="header-content">
+            <img src="/logo.svg" alt="UVACO 標誌" className="logo" />
+            <h1>UVACO</h1>
+            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={() => setShowSharedTestimonial(false)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#9bb8c4',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+              >
+                進入完整系統
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main className="app-main">
+          <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+            <div style={{
+              backgroundColor: '#fff3cd',
+              border: '1px solid #ffeaa7',
+              borderRadius: '8px',
+              padding: '15px',
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              <h2 style={{ color: '#856404', marginBottom: '10px' }}>
+                💬 用戶見證分享
+              </h2>
+              <p style={{ color: '#856404', fontSize: '14px', margin: 0 }}>
+                以下為用戶個人使用體驗分享，僅供參考，效果因人而異
+              </p>
+            </div>
+
+            {sharedTestimonial ? (
+              <TestimonialCard testimonial={sharedTestimonial} />
+            ) : (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '40px 20px',
+                color: '#666'
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '10px' }}>😕</div>
+                <p>找不到此見證內容</p>
+                <p style={{ fontSize: '14px' }}>此見證可能已被移除或連結有誤</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // 如果有分享見證但已登入，顯示見證並提示
+  if (showSharedTestimonial && isAuthenticated) {
+    const sharedTestimonial = testimonials.find(t => t.id === sharedTestimonialId);
+    
+    return (
+      <div className="app">
+        <header className="app-header">
+          <div className="header-content">
+            <img src="/logo.svg" alt="UVACO 標誌" className="logo" />
+            <h1>UVACO</h1>
+            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ 
+                fontSize: '14px', 
+                color: '#666',
+                padding: '5px 10px',
+                backgroundColor: '#f0f0f0',
+                borderRadius: '15px'
+              }}>
+                👤 {getRoleDisplayName()}
+              </span>
+              
+              <button
+                onClick={closeSharedTestimonial}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#9bb8c4',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+                title="返回系統"
+              >
+                返回系統
+              </button>
+              
+              <button
+                onClick={logout}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#9ca3af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+                title="登出"
+              >
+                登出
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main className="app-main">
+          <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+            <div style={{
+              backgroundColor: '#e8f4f8',
+              border: '1px solid #bee5eb',
+              borderRadius: '8px',
+              padding: '15px',
+              marginBottom: '20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <h3 style={{ color: '#0c5460', margin: '0 0 5px 0' }}>
+                  🎯 分享的見證
+                </h3>
+                <p style={{ color: '#0c5460', fontSize: '14px', margin: 0 }}>
+                  您正在查看通過分享鏈接訪問的見證
+                </p>
+              </div>
+              <button
+                onClick={closeSharedTestimonial}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#17a2b8',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                返回系統
+              </button>
+            </div>
+
+            {sharedTestimonial ? (
+              <TestimonialCard testimonial={sharedTestimonial} />
+            ) : (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '40px 20px',
+                color: '#666'
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '10px' }}>😕</div>
+                <p>找不到此見證內容</p>
+                <p style={{ fontSize: '14px' }}>此見證可能已被移除或連結有誤</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   // 如果未登入，顯示登入組件
   if (!isAuthenticated) {
-      return <LoginComponent onLoginSuccess={login} />;
+    return <LoginComponent onLoginSuccess={login} />;
   }
 
   return (
@@ -337,7 +441,7 @@ const filteredTestimonials = useMemo(() => {
                 }}
                 title="管理員控制台"
               >
-                管理
+                ⚙️ 管理
               </button>
             )}
             
@@ -360,97 +464,65 @@ const filteredTestimonials = useMemo(() => {
           </div>
         </div>
       </header>
-      
+
       <main className="app-main">
         {currentView === 'products' && (
           <div>
-            {/* <h2>產品介紹</h2> */}
-            
-            <ProductSearch
-              searchTerm={productSearchTerm}
-              onSearchChange={setProductSearchTerm}
-              onClearSearch={handleClearProductSearch}
-            />
+            <div style={{ marginBottom: '20px' }}>
+              <ProductSearch 
+                searchTerm={productSearchTerm}
+                onSearchChange={setProductSearchTerm}
+                onClearSearch={() => setProductSearchTerm('')}
+              />
+              
+              <ProductSort 
+                sortBy={productSortBy}
+                onSortChange={setProductSortBy}
+                products={filteredAndSortedProducts}
+                testimonials={testimonials}
+              />
+            </div>
 
-            <ProductSort
-              sortBy={productSortBy}
-              onSortChange={setProductSortBy}
-            />
-
-            <SearchResults
-              totalCount={removeDuplicateProducts(products).length}
-              filteredCount={filteredAndSortedProducts.length}
-              searchTerm={productSearchTerm}
-              type="產品"
-            />
-
-            {filteredAndSortedProducts.length > 0 ? (
-              <div className="products-grid">
-                {filteredAndSortedProducts.map(product => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onViewDetails={handleViewDetails}
-                    testimonialCount={getTestimonialsForProduct(product.id).length}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <div className="empty-state-icon">📦</div>
-                <h3>找不到符合條件的產品</h3>
-                <p>試試其他關鍵字</p>
-                {productSearchTerm && (
-                  <button
-                    onClick={handleClearProductSearch}
-                    className="btn btn-primary btn-sm"
-                  >
-                    清除搜尋
-                  </button>
-                )}
-              </div>
+            {(productSearchTerm || productSortBy !== 'default') && (
+              <SearchResults 
+                query={productSearchTerm}
+                count={filteredAndSortedProducts.length}
+                type="產品"
+                onClear={clearFilters}
+              />
             )}
+
+            <div className="products-grid">
+              {filteredAndSortedProducts.map(product => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product}
+                  onViewDetails={handleViewDetails}
+                  testimonialCount={getTestimonialsForProduct(product.id).length}
+                />
+              ))}
+            </div>
           </div>
         )}
 
         {currentView === 'testimonials' && (
           <ProtectedComponent permission="view_testimonials">
             <div>
-              {/* <h2>用戶心得分享</h2> */}
-              
-              <ProtectedComponent permission="submit_testimonial">
-                <button 
-                  onClick={() => handleAddTestimonial()}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#a8956f',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    marginBottom: '20px'
-                  }}
-                >
-                  💬 分享我的使用心得
-                </button>
-              </ProtectedComponent>
+              <div style={{ marginBottom: '20px' }}>
+                <TestimonialFilter 
+                  searchTerm={testimonialSearchTerm}
+                  onSearchChange={setTestimonialSearchTerm}
+                  selectedProduct={selectedProductFilter}
+                  onProductChange={setSelectedProductFilter}
+                  products={removeDuplicateProducts(products)}
+                  onClearFilters={clearFilters}
+                />
+              </div>
 
-              <TestimonialFilter
-                searchTerm={testimonialSearchTerm}
-                onSearchChange={setTestimonialSearchTerm}
-                selectedProduct={selectedProductFilter}
-                onProductChange={setSelectedProductFilter}
-                products={removeDuplicateProducts(products)}
-                onClearFilters={handleClearTestimonialFilters}
-              />
-
-              <SearchResults
-                totalCount={testimonials.length}
-                filteredCount={filteredTestimonials.length}
-                searchTerm={testimonialSearchTerm || selectedProductFilter ? 
+              <SearchResults 
+                query={testimonialSearchTerm ? 
                   (testimonialSearchTerm + ' ' + (selectedProductFilter ? '篩選條件' : '')).trim() : ''}
+                count={filteredTestimonials.length}
                 type="心得分享"
               />
 

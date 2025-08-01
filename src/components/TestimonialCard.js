@@ -1,7 +1,10 @@
-import React from 'react';
+// src/components/TestimonialCard.js - 在原有基礎上添加分享鏈接功能
+import React, { useState } from 'react';
 
 const TestimonialCard = ({ testimonial }) => {
-  // 處理產品名稱顯示（支援單一產品和多產品）
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  // 處理產品名稱顯示（支援單一產品和多產品）- 保留原有邏輯
   const getProductDisplay = () => {
     // 新版本：支援多產品
     if (testimonial.productNames && Array.isArray(testimonial.productNames)) {
@@ -18,6 +21,33 @@ const TestimonialCard = ({ testimonial }) => {
 
   const productNames = getProductDisplay();
   const displayName = testimonial.displayName || (testimonial.isNamePublic ? testimonial.userName : '匿名用戶');
+
+  // 新增：生成見證的分享鏈接
+  const generateShareLink = () => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}?testimonial=${testimonial.id}`;
+  };
+
+  // 新增：複製分享鏈接到剪貼板
+  const copyShareLink = async () => {
+    try {
+      const shareLink = generateShareLink();
+      await navigator.clipboard.writeText(shareLink);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (error) {
+      console.error('複製失敗:', error);
+      // 備用方案：使用選取複製
+      const textArea = document.createElement('textarea');
+      textArea.value = generateShareLink();
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    }
+  };
 
   return (
     <div style={{ 
@@ -37,7 +67,7 @@ const TestimonialCard = ({ testimonial }) => {
         gap: '10px'
       }}>
         <div style={{ flex: 1 }}>
-          {/* 產品名稱區域 - 支援多產品顯示 */}
+          {/* 產品名稱區域 - 保留原有樣式 */}
           <div style={{ marginBottom: '8px' }}>
             <div style={{ 
               fontSize: '14px', 
@@ -79,16 +109,53 @@ const TestimonialCard = ({ testimonial }) => {
             </div>
           </div>
           
-          {/* 分享者資訊 */}
+          {/* 分享者資訊 - 保留原有樣式 */}
           <div style={{ fontSize: '14px', color: '#666', marginBottom: '5px' }}>
             👤 {displayName}
           </div>
         </div>
-        
-        {/* 使用時間 */}
-        <div style={{ fontSize: '14px', color: '#555' }}>
-          <strong>使用時間：</strong>{testimonial.duration || '未指定'}
+
+        {/* 新增：分享鏈接按鈕 */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <button
+            onClick={copyShareLink}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '6px 10px',
+              backgroundColor: copySuccess ? '#8fbc8f' : '#f0f0f0',
+              color: copySuccess ? 'white' : '#666',
+              border: 'none',
+              borderRadius: '15px',
+              fontSize: '11px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {copySuccess ? (
+              <>
+                <span style={{ fontSize: '10px' }}>✓</span>
+                <span>已複製</span>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: '10px' }}>🔗</span>
+                <span>分享</span>
+              </>
+            )}
+          </button>
         </div>
+      </div>
+      
+      {/* 使用時間 - 保留原有樣式 */}
+      <div style={{ fontSize: '14px', color: '#555' }}>
+        <strong>使用時間：</strong>{testimonial.duration || '未指定'}
       </div>
 
       {testimonial.system && (
@@ -97,7 +164,7 @@ const TestimonialCard = ({ testimonial }) => {
         </div>
       )}
       
-      {/* 個人體驗標籤 */}
+      {/* 個人體驗標籤 - 保留原有樣式 */}
       <div style={{
         display: 'inline-block',
         backgroundColor: '#e3f2fd',
@@ -111,7 +178,7 @@ const TestimonialCard = ({ testimonial }) => {
         個人體驗分享
       </div>
       
-      {/* 心得內容 */}
+      {/* 心得內容 - 保留原有樣式 */}
       <div style={{ 
         backgroundColor: '#f8f9fa', 
         padding: '12px', 
@@ -153,7 +220,7 @@ const TestimonialCard = ({ testimonial }) => {
         </div>
       </div>
       
-      {/* 分享時間 */}
+      {/* 分享時間 - 保留原有樣式 */}
       <div style={{
         marginTop: '8px',
         fontSize: '11px',
