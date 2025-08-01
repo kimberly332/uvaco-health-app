@@ -226,7 +226,7 @@ function AppContent() {
 
   // 如果用戶未登入，顯示登入頁面
   if (!isAuthenticated) {
-    return <LoginComponent onLogin={login} />;
+    return <LoginComponent onLoginSuccess={login} />;
   }
 
   return (
