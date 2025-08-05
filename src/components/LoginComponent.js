@@ -1,5 +1,5 @@
-// src/components/LoginComponent.js
-import React, { useState } from 'react';
+// src/components/LoginComponent.js - 修復版本，改善登入後跳轉處理
+import React, { useState, useEffect } from 'react';
 import { authenticateUser, USER_ROLES } from '../services/authService';
 
 const LoginComponent = ({ onLoginSuccess }) => {
@@ -7,6 +7,17 @@ const LoginComponent = ({ onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [pendingRedirectMessage, setPendingRedirectMessage] = useState(''); // 新增：顯示待跳轉提示
+
+  // 🔧 修復：檢查是否有待跳轉的分享連結
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const testimonialId = urlParams.get('testimonial');
+    
+    if (testimonialId) {
+      setPendingRedirectMessage('檢測到分享連結，登入後將自動跳轉到相關心得分享');
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,7 +34,10 @@ const LoginComponent = ({ onLoginSuccess }) => {
       const result = await authenticateUser(password.trim());
       
       if (result.success) {
-        // 登入成功，傳遞用戶信息給父組件
+        // 🔧 修復：登入成功後，確保父組件能正確處理跳轉
+        console.log('登入成功，準備跳轉...'); // 調試用
+        
+        // 傳遞用戶信息給父組件
         onLoginSuccess({
           role: result.role,
           message: result.message
@@ -32,6 +46,7 @@ const LoginComponent = ({ onLoginSuccess }) => {
         setError(result.message);
       }
     } catch (error) {
+      console.error('登入錯誤:', error);
       setError('登入過程發生錯誤，請稍後再試');
     } finally {
       setIsLoading(false);
@@ -88,6 +103,43 @@ const LoginComponent = ({ onLoginSuccess }) => {
           </p>
         </div>
 
+        {/* 🔧 新增：分享連結提示 */}
+        {pendingRedirectMessage && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '12px',
+            backgroundColor: '#e8f5e8',
+            border: '1px solid #4caf50',
+            borderRadius: '6px',
+            fontSize: '14px',
+            color: '#2e7d32',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+              🔗 檢測到分享連結
+            </div>
+            <div>
+              {pendingRedirectMessage}
+            </div>
+          </div>
+        )}
+
+        {/* 錯誤提示 */}
+        {error && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '12px',
+            backgroundColor: '#fee',
+            border: '1px solid #fcc',
+            borderRadius: '6px',
+            color: '#c33',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+            {error}
+          </div>
+        )}
+
         {/* 登入表單 */}
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: '20px' }}>
@@ -104,7 +156,7 @@ const LoginComponent = ({ onLoginSuccess }) => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="請輸入密碼"
+                placeholder="輸入密碼以訪問系統"
                 disabled={isLoading}
                 style={{
                   width: '100%',
@@ -112,27 +164,30 @@ const LoginComponent = ({ onLoginSuccess }) => {
                   border: '2px solid #e1e5e9',
                   borderRadius: '8px',
                   fontSize: '16px',
-                  outline: 'none',
                   transition: 'border-color 0.3s',
                   backgroundColor: isLoading ? '#f8f9fa' : 'white',
+                  cursor: isLoading ? 'not-allowed' : 'text',
+                  outline: 'none',
                   boxSizing: 'border-box'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#8fbc8f'}
+                onFocus={(e) => e.target.style.borderColor = '#a8956f'}
                 onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
                 style={{
                   position: 'absolute',
                   right: '12px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'none',
+                  backgroundColor: 'transparent',
                   border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  color: '#666'
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  fontSize: '16px',
+                  color: '#666',
+                  padding: '4px'
                 }}
               >
                 {showPassword ? '🙈' : '👁️'}
@@ -140,22 +195,6 @@ const LoginComponent = ({ onLoginSuccess }) => {
             </div>
           </div>
 
-          {/* 錯誤訊息 */}
-          {error && (
-            <div style={{
-              backgroundColor: '#f8d7da',
-              color: '#721c24',
-              padding: '12px',
-              borderRadius: '6px',
-              marginBottom: '20px',
-              fontSize: '14px',
-              border: '1px solid #f5c6cb'
-            }}>
-              ❌ {error}
-            </div>
-          )}
-
-          {/* 登入按鈕 */}
           <button
             type="submit"
             disabled={isLoading || !password.trim()}

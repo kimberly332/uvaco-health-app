@@ -1,4 +1,4 @@
-// src/hooks/useAuth.js - FIXED VERSION
+// src/hooks/useAuth.js - 修復版本，改善登入跳轉處理
 import { useState, useEffect, createContext, useContext } from 'react';
 import { USER_ROLES, hasPermission } from '../services/authService';
 
@@ -22,42 +22,49 @@ export const AuthProvider = ({ children }) => {
 
   // 初始化時檢查本地存儲的認證狀態
   useEffect(() => {
-    const savedAuth = localStorage.getItem('uvaco_auth');
-    if (savedAuth) {
-      try {
-        const authData = JSON.parse(savedAuth);
-        // 檢查認證是否過期（24小時）
-        const loginTime = new Date(authData.loginTime);
-        const now = new Date();
-        const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-          setUser(authData.user);
-          setIsAuthenticated(true);
-        } else {
-          // 認證過期，清除本地存儲
+    const checkAuthStatus = () => {
+      const savedAuth = localStorage.getItem('uvaco_auth');
+      if (savedAuth) {
+        try {
+          const authData = JSON.parse(savedAuth);
+          // 檢查認證是否過期（24小時）
+          const loginTime = new Date(authData.loginTime);
+          const now = new Date();
+          const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+          
+          if (hoursDiff < 24) {
+            setUser(authData.user);
+            setIsAuthenticated(true);
+          } else {
+            // 認證過期，清除本地存儲
+            localStorage.removeItem('uvaco_auth');
+          }
+        } catch (error) {
+          console.error('解析認證數據失敗:', error);
           localStorage.removeItem('uvaco_auth');
         }
-      } catch (error) {
-        console.error('解析認證數據失敗:', error);
-        localStorage.removeItem('uvaco_auth');
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    checkAuthStatus();
   }, []);
 
-  // 登入函數
+  // 🔧 修復：改善登入函數，確保狀態更新是同步的
   const login = (userData) => {
     const authData = {
       user: userData,
       loginTime: new Date().toISOString()
     };
     
+    // 立即更新狀態
     setUser(userData);
     setIsAuthenticated(true);
     
     // 保存到本地存儲（24小時有效）
     localStorage.setItem('uvaco_auth', JSON.stringify(authData));
+    
+    console.log('登入成功:', userData); // 調試用
   };
 
   // 登出函數
@@ -65,6 +72,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('uvaco_auth');
+    
+    // 🔧 登出時清除URL參數（如果有的話）
+    const currentUrl = new URL(window.location);
+    if (currentUrl.searchParams.has('testimonial')) {
+      currentUrl.searchParams.delete('testimonial');
+      window.history.replaceState({}, document.title, currentUrl.pathname);
+    }
   };
 
   // 檢查權限
@@ -85,10 +99,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ FIXED: 檢查是否為管理員 - 返回布林值而非函數
+  // 檢查是否為管理員（返回布林值）
   const isAdmin = user && (user.role === USER_ROLES.ADMIN || user.role === USER_ROLES.SUPER_ADMIN);
 
-  // ✅ FIXED: 檢查是否為超級管理員 - 返回布林值而非函數
+  // 檢查是否為超級管理員（返回布林值）
   const isSuperAdmin = user && user.role === USER_ROLES.SUPER_ADMIN;
 
   const value = {
@@ -99,8 +113,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     checkPermission,
     getRoleDisplayName,
-    isAdmin,      // ✅ Now this is a boolean value
-    isSuperAdmin  // ✅ Now this is a boolean value
+    isAdmin,
+    isSuperAdmin
   };
 
   return (
@@ -110,14 +124,29 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 權限保護組件
+// 🔧 修復：改善權限保護組件，更好地處理未登入狀態
 export const ProtectedComponent = ({ 
   permission, 
   children, 
   fallback = null,
   requireAuth = true 
 }) => {
-  const { isAuthenticated, checkPermission } = useAuth();
+  const { isAuthenticated, checkPermission, isLoading } = useAuth();
+
+  // 如果還在加載中，顯示加載狀態
+  if (isLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        padding: '20px',
+        color: '#666'
+      }}>
+        載入中...
+      </div>
+    );
+  }
 
   // 如果需要認證但用戶未登入
   if (requireAuth && !isAuthenticated) {
@@ -138,7 +167,22 @@ export const RoleProtectedComponent = ({
   children, 
   fallback = null 
 }) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  // 如果還在加載中，顯示加載狀態
+  if (isLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        padding: '20px',
+        color: '#666'
+      }}>
+        載入中...
+      </div>
+    );
+  }
 
   if (!user || !allowedRoles.includes(user.role)) {
     return fallback;

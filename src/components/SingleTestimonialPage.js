@@ -168,7 +168,7 @@ const SingleTestimonialPage = ({ testimonialId, testimonials, products, onBack }
                   cursor: 'pointer'
                 }}
               >
-                ← 返回列表
+                返回列表
               </button>
             )}
           </div>
