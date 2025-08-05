@@ -1,4 +1,4 @@
-// src/App.js - 完整版本，在原有基礎上新增見證排序功能
+// src/App.js - 完整版本，在原有基礎上新增見證排序功能和突出的分享心得按鈕
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useProducts, useTestimonials } from './hooks/useFirestore';
 import { INITIAL_PRODUCTS } from './utils/constants';
@@ -285,12 +285,33 @@ function AppContent() {
         </div>
       </header>
 
+      {/* 新增：CSS動畫樣式 */}
+      <style jsx>{`
+        @keyframes gentle-pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.9;
+          }
+        }
+      `}</style>
+
       {/* 主要內容 */}
       <main className="app-main">
         {/* 產品頁面 */}
         {currentView === 'products' && (
           <div>
-            <h2>產品介紹</h2>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              marginBottom: '20px',
+              flexWrap: 'wrap',
+              gap: '15px'
+            }}>
+              <h2 style={{ margin: 0 }}>產品介紹</h2>
+            </div>
             
             {/* 搜尋和篩選區域 */}
             <div style={{ marginBottom: '20px' }}>
@@ -366,7 +387,39 @@ function AppContent() {
         {currentView === 'testimonials' && (
           <ProtectedComponent permission="view_testimonials">
             <div>
-              <h2>心得分享</h2>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '20px',
+                flexWrap: 'wrap',
+                gap: '15px'
+              }}>
+                <h2 style={{ margin: 0 }}>心得分享</h2>
+                
+                {/* 新增：見證頁面的分享心得按鈕 */}
+                <ProtectedComponent permission="submit_testimonial">
+                  <button
+                    onClick={() => handleAddTestimonial()}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+
+                      padding: '12px',
+                      margin: '0',
+                      backgroundColor: 'rgb(168, 149, 111)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius:'6px',
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                   💬 分享我的使用心得
+                  </button>
+                </ProtectedComponent>
+              </div>
               
               <div style={{ marginBottom: '20px' }}>
                 <TestimonialFilter 
