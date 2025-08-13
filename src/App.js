@@ -576,7 +576,40 @@ function AppContent() {
         {currentView === 'testimonials' && !showSharedTestimonial && (
           <ProtectedComponent permission="view_testimonials">
             <div>
-              <h2>心得分享</h2>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '20px',
+                flexWrap: 'wrap',
+                gap: '15px'
+              }}>
+                <h2 style={{ margin: 0 }}>心得分享</h2>
+                
+                {/* 新增：見證頁面的分享心得按鈕 */}
+                <ProtectedComponent permission="submit_testimonial">
+                  <button
+                    onClick={() => handleAddTestimonial()}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+
+                      padding: '12px',
+                      margin: '0',
+                      backgroundColor: 'rgb(168, 149, 111)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius:'6px',
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                   💬 分享我的使用心得
+                  </button>
+                </ProtectedComponent>
+              </div>
+
               
               <div style={{ marginBottom: '20px' }}>
                 <TestimonialFilter 
